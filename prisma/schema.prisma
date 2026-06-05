@@ -1,0 +1,260 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  EDITOR
+  ASISTAN
+  ADMIN
+  SUPERADMIN
+  MUHASEBE
+}
+
+enum DocumentType {
+  EXAM_PDF
+  SOLUTION_PDF
+  OTHER
+}
+
+model Institution {
+  id           String        @id @default(cuid())
+  name         String
+  subdomain    String?       @unique
+  isActive     Boolean       @default(true)
+  users        User[]
+  groups       Group[]
+  exams        Exam[]
+  packages     ExamPackage[]
+  transactions Transaction[]
+  documents    Document[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model User {
+  id       String  @id @default(cuid())
+  email    String  @unique
+  password String
+  role     Role    @default(STUDENT)
+  name     String?
+  phone    String?
+  isActive Boolean @default(true)
+
+  institutionId String?
+  institution   Institution? @relation(fields: [institutionId], references: [id])
+
+  groups         Group[]         @relation("UserGroups")
+  directExams    Exam[]          @relation("DirectExams")
+  results        ExamResult[]
+  transactions   Transaction[]
+  logs           SecurityLog[]
+  packageResults PackageResult[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+}
+
+model Group {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  price       Float     @default(0)
+  isActive    Boolean   @default(true)
+  expireAt    DateTime?
+
+  parentId String?
+  parent   Group?  @relation("SubGroups", fields: [parentId], references: [id], onDelete: Cascade)
+  children Group[] @relation("SubGroups")
+
+  institutionId String?
+  institution   Institution? @relation(fields: [institutionId], references: [id])
+
+  users     User[]   @relation("UserGroups")
+  exams     Exam[] // Atanmış Sınavlar
+  packages  ExamPackage[] // Atanmış Sınav Paketleri
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Exam {
+  id                       String        @id @default(cuid())
+  title                    String
+  description              String?
+  pdfUrl                   String // Sınav PDF URL'i
+  solutionPdfUrl           String? // Çözüm Kitapçığı PDF URL'i
+  startTime                DateTime? // Sınavın başlama zamanı (null ise hep açık)
+  endTime                  DateTime? // Sınavın bitiş zamanı
+  showResultsTime          DateTime? // PDF çözümlerin ve doğru/yanlışın gösterileceği zaman
+  isResultsPublished       Boolean       @default(false)
+  virtualTotalParticipants Int?
+  baseScore                Float         @default(100) // Taban Puan
+  penaltyRatio             Float         @default(0.25) // Yanlışın doğruyu götürme oranı
+  questionCount            Int
+  durationMinutes          Int? // Sınav Süresi (Dakika)
+  isActive                 Boolean       @default(true) // Başlangıçta aktif
+  examTemplate             String        @default("CUSTOM") // ÖSYM Şablonu
+  sessionType              String        @default("STANDART") // Oturum Türü (STANDART, GY_GK, EB, OABT, ALAN)
+  sections                 Json?         @default("[]") // [{id, title, count, points}]
+  keys                     QuestionKey[]
+  results                  ExamResult[]
+  logs                     SecurityLog[]
+  groups                   Group[] // Bu sınava yetkisi olan Gruplar
+  directUsers              User[]        @relation("DirectExams") // Bağımsız Erişim
+
+  packageId String?
+  package   ExamPackage? @relation("PackageExams", fields: [packageId], references: [id])
+
+  institutionId String?
+  institution   Institution? @relation(fields: [institutionId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model QuestionKey {
+  id             String   @id @default(cuid())
+  examId         String
+  exam           Exam     @relation(fields: [examId], references: [id], onDelete: Cascade)
+  questionNumber Int
+  correctOption  String // A, B, C, D, E veya IPTAL
+  topic          String? // Kazanım / Konu etiketi
+  points         Float    @default(1) // Katsayı Puanı
+  videoUrl       String? // Çözüm Video Linki
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([examId, questionNumber])
+}
+
+model ExamResult {
+  id           String          @id @default(cuid())
+  examId       String
+  exam         Exam            @relation(fields: [examId], references: [id], onDelete: Cascade)
+  userId       String
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  score        Float           @default(0)
+  correctCount Int             @default(0)
+  wrongCount   Int             @default(0)
+  emptyCount   Int             @default(0)
+  isFinished   Boolean         @default(false)
+  drawings     Json? // Dokunmatik Canvas Çizim Verisi
+  answers      StudentAnswer[]
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  @@unique([examId, userId])
+  @@index([userId])
+  @@index([examId])
+  @@index([isFinished])
+}
+
+model StudentAnswer {
+  id             String     @id @default(cuid())
+  resultId       String
+  result         ExamResult @relation(fields: [resultId], references: [id], onDelete: Cascade)
+  questionNumber Int
+  selectedOption String? // A, B, C, D, E veya Boş ise null
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([resultId, questionNumber])
+  @@index([resultId])
+}
+
+model SecurityLog {
+  id         String   @id @default(cuid())
+  examId     String
+  exam       Exam     @relation(fields: [examId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  actionType String // BLUR, PRINT_SCREEN, COPY_ATTEMPT, DEVTOOLS_OPEN vs.
+  details    String? // Hangi OS, hangi tarayıcıdan, log mesajı
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([examId])
+  @@index([createdAt])
+  @@index([actionType])
+  @@index([examId, userId]) // Bileşik: "Bu sınavda bu öğrenci ne yaptı?" sorgusu
+  @@index([examId, createdAt]) // Bileşik: "Bu sınavın son logları" sorgusu
+}
+
+model Transaction {
+  id      String  @id @default(cuid())
+  userId  String
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount  Float
+  reason  String // "GROUP_JOIN" veya "EXAM_PURCHASE"
+  groupId String?
+  examId  String?
+
+  institutionId String?
+  institution   Institution? @relation(fields: [institutionId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model Document {
+  id           String       @id @default(cuid())
+  name         String
+  title        String?
+  category     String?
+  academicYear String?
+  description  String?
+  url          String
+  type         DocumentType @default(EXAM_PDF)
+  tags         String? // Virgülle ayrılmış etiketler
+  sizeBytes    Int?
+
+  institutionId String?
+  institution   Institution? @relation(fields: [institutionId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([type])
+  @@index([createdAt])
+}
+
+model ExamPackage {
+  id          String  @id @default(cuid())
+  title       String
+  description String?
+  isActive    Boolean @default(true)
+  isSequential Boolean @default(false)
+
+  institutionId String?
+  institution   Institution? @relation(fields: [institutionId], references: [id])
+
+  exams   Exam[]          @relation("PackageExams")
+  results PackageResult[]
+  groups  Group[]         // Paketin Atandığı Gruplar
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PackageResult {
+  id        String      @id @default(cuid())
+  packageId String
+  package   ExamPackage @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  scores     Json? // {"KPSS_P3": 85.4, "KPSS_P10": 80.2, "KPSS_P93": 75.1}
+  isComputed Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([packageId, userId])
+}

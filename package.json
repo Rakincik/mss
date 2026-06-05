@@ -3,15 +3,26 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
+    "dev": "next dev --webpack",
+    "build": "next build --webpack",
+    "start": "NODE_OPTIONS='--max-old-space-size=3072' next start",
+    "lint": "eslint",
+    "plesk-deploy": "npx prisma generate && npx prisma db push --accept-data-loss && next build --webpack"
   },
   "dependencies": {
+    "@prisma/client": "^6.19.3",
+    "@serwist/next": "^9.5.11",
+    "dayjs": "^1.11.20",
+    "dotenv": "^17.4.2",
+    "lucide-react": "^1.8.0",
     "next": "16.2.4",
+    "pdfjs-dist": "^5.4.296",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "react-pdf": "^10.4.1",
+    "recharts": "^3.8.1",
+    "serwist": "^9.5.11",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
@@ -20,6 +31,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.4",
+    "prisma": "^6.19.3",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
