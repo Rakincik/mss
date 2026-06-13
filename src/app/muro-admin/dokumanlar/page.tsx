@@ -23,6 +23,8 @@ export default function DocumentArchivePage() {
   const [modalAcademicYear, setModalAcademicYear] = useState("");
   const [modalDescription, setModalDescription] = useState("");
   const [modalTags, setModalTags] = useState("");
+  
+  const [documentToDelete, setDocumentToDelete] = useState<string | null>(null);
 
   const [toast, setToast] = useState<{message: string, type: "success" | "error" | "info" | null}>({message: "", type: null});
 
@@ -49,15 +51,21 @@ export default function DocumentArchivePage() {
     fetchDocuments();
   }, [activeTab, searchQuery]);
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Bu dokümanı arşivden silmek istediğinize emin misiniz? (Mevcut sınavlara bağlıysa o sınavlarda erişim kopabilir!)")) return;
+  const handleDelete = (id: string) => {
+    setDocumentToDelete(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!documentToDelete) return;
     
     try {
-      await deleteDocument(id);
+      await deleteDocument(documentToDelete);
       showToast("Doküman silindi.", "success");
       fetchDocuments();
     } catch (err: any) {
       showToast(err.message || "Silinemedi.", "error");
+    } finally {
+      setDocumentToDelete(null);
     }
   };
 
@@ -372,6 +380,35 @@ export default function DocumentArchivePage() {
                   Dosyayı Arşive Ekle
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Silme Onay Modal'ı */}
+      {documentToDelete && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl border border-slate-100 flex flex-col items-center text-center animate-in zoom-in-95 duration-200">
+            <div className="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mb-6">
+              <AlertCircle className="w-8 h-8 text-rose-600" />
+            </div>
+            <h2 className="text-2xl font-black text-slate-800 mb-2">Dokümanı Sil</h2>
+            <p className="text-slate-500 text-sm font-medium mb-8 leading-relaxed">
+               Bu dokümanı arşivden silmek istediğinize emin misiniz? Mevcut sınavlara bağlıysa o sınavlarda erişim kopabilir!
+            </p>
+            <div className="flex flex-col gap-3 w-full">
+              <button 
+                onClick={confirmDelete}
+                className="w-full py-3.5 px-4 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl shadow-[0_4px_15px_rgba(225,29,72,0.2)] transition-all"
+              >
+                Evet, Kalıcı Olarak Sil
+              </button>
+              <button 
+                onClick={() => setDocumentToDelete(null)}
+                className="w-full py-3.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-colors"
+              >
+                İptal Et
+              </button>
             </div>
           </div>
         </div>
