@@ -10,7 +10,7 @@ export async function getSecurityLogs(page: number = 1, pageSize: number = 25) {
 
   const whereClause: any = {};
   if (currentUser.role !== "SUPERADMIN") {
-    whereClause.user = { institutionId: currentUser.institutionId || null };
+    whereClause.exam = { institutionId: currentUser.institutionId || null };
   }
 
   const skip = (page - 1) * pageSize;
@@ -36,7 +36,7 @@ export async function deleteLog(id: string) {
   const currentUser = await getCurrentUser();
   const whereClause: any = { id };
   if (currentUser?.role !== "SUPERADMIN") {
-    whereClause.user = { institutionId: currentUser?.institutionId || null };
+    whereClause.exam = { institutionId: currentUser?.institutionId || null };
   }
   
   const log = await prisma.securityLog.findFirst({
@@ -82,7 +82,7 @@ export async function getLogStats() {
   const currentUser = await getCurrentUser();
   const whereClause: any = {};
   if (currentUser?.role !== "SUPERADMIN") {
-    whereClause.user = { institutionId: currentUser?.institutionId || null };
+    whereClause.exam = { institutionId: currentUser?.institutionId || null };
   }
 
   const [totalLogs, oldestLog, newestLog] = await Promise.all([

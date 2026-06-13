@@ -16,7 +16,11 @@ export default async function AdminDashboard() {
   // Güvenlik logları için where
   const whereLogClause: any = {};
   if (currentUser?.role !== "SUPERADMIN" && currentUser?.institutionId) {
-    whereLogClause.user = { institutionId: currentUser.institutionId };
+    whereLogClause.exam = { institutionId: currentUser.institutionId };
+  }
+  else if (currentUser?.role !== "SUPERADMIN") {
+    // ADMIN but no institutionId (fallback)
+    whereLogClause.exam = { institutionId: null };
   }
 
   // Gerçek veriler — paralel sorgular
