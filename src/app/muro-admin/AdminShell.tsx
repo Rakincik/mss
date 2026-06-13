@@ -25,7 +25,7 @@ export default function AdminShell({ children, user }: AdminShellProps) {
       )}
 
       {/* Sidebar */}
-      <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white border-r border-slate-200 flex flex-col shadow-sm transform transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+      <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white border-r border-slate-200 flex flex-col shadow-sm transform transition-transform duration-300 ease-in-out print:hidden ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
         <div className="h-16 flex items-center justify-between px-6 border-b border-slate-100">
           <div></div>
           <button 
@@ -45,10 +45,6 @@ export default function AdminShell({ children, user }: AdminShellProps) {
 
           {user.role !== "MUHASEBE" && (
             <>
-              <Link href="/muro-admin/istatistikler" onClick={() => setSidebarOpen(false)} className="flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-slate-600 hover:text-orange-700 hover:bg-orange-50 rounded-xl transition-all group">
-                <BarChart3 className="w-5 h-5 text-slate-400 group-hover:text-orange-500 transition-colors" />
-                <span>İstatistikler</span>
-              </Link>
               <Link href="/muro-admin/sinavlar" onClick={() => setSidebarOpen(false)} className="flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-slate-600 hover:text-purple-700 hover:bg-purple-50 rounded-xl transition-all group">
                 <BookOpen className="w-5 h-5 text-slate-400 group-hover:text-purple-500 transition-colors" />
                 <span>Sınavlar</span>
@@ -74,6 +70,10 @@ export default function AdminShell({ children, user }: AdminShellProps) {
                   <span>Kurumlar (Tenant)</span>
                 </Link>
               )}
+              <Link href="/muro-admin/istatistikler" onClick={() => setSidebarOpen(false)} className="flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-slate-600 hover:text-orange-700 hover:bg-orange-50 rounded-xl transition-all group mb-1">
+                <BarChart3 className="w-5 h-5 text-slate-400 group-hover:text-orange-500 transition-colors" />
+                <span>İstatistikler</span>
+              </Link>
               <Link href="/muro-admin/guvenlik" onClick={() => setSidebarOpen(false)} className="flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-slate-600 hover:text-red-700 hover:bg-red-50 rounded-xl transition-all group">
                 <ShieldAlert className="w-5 h-5 text-red-500 group-hover:text-red-600 transition-colors" />
                 <span className="text-red-600 group-hover:text-red-700">Güvenlik Logları</span>
@@ -121,7 +121,7 @@ export default function AdminShell({ children, user }: AdminShellProps) {
           </div>
         )}
 
-        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-8 shadow-sm z-10 shrink-0 gap-4">
+        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-8 shadow-sm z-10 shrink-0 gap-4 print:hidden">
           {/* Hamburger (Mobile) */}
           <button 
             onClick={() => setSidebarOpen(true)}

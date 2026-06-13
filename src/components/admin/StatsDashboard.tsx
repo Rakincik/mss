@@ -1,7 +1,8 @@
 "use client";
 
+import { useState } from 'react';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { Download, FileSpreadsheet, TrendingUp, Users, Target, Activity, Award } from 'lucide-react';
+import { Download, FileSpreadsheet, TrendingUp, Users, Target, Activity, Award, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
 interface StatsDashboardProps {
@@ -19,6 +20,14 @@ interface StatsDashboardProps {
 }
 
 export function StatsDashboard({ heroStats, trendData, rankings, leaderboard, exams }: StatsDashboardProps) {
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  const filteredExams = exams.filter(e => e.title.toLowerCase().includes(searchTerm.toLowerCase()));
+  const totalPages = Math.ceil(filteredExams.length / itemsPerPage);
+  const currentExams = filteredExams.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const exportToExcel = () => {
     // Kurum Genel Özeti
@@ -49,6 +58,12 @@ export function StatsDashboard({ heroStats, trendData, rankings, leaderboard, ex
     })));
 
     const wb = XLSX.utils.book_new();
+
+    // Kolon Genişlikleri Ekle
+    summarySheet['!cols'] = [{wch: 18}, {wch: 15}, {wch: 25}, {wch: 22}, {wch: 22}];
+    examsSheet['!cols'] = [{wch: 40}, {wch: 15}, {wch: 15}, {wch: 15}, {wch: 15}];
+    leaderSheet['!cols'] = [{wch: 8}, {wch: 25}, {wch: 30}, {wch: 15}, {wch: 15}];
+
     XLSX.utils.book_append_sheet(wb, summarySheet, "Kurum Özeti");
     XLSX.utils.book_append_sheet(wb, examsSheet, "Sınav Karneleri");
     XLSX.utils.book_append_sheet(wb, leaderSheet, "Onur Tablosu");
@@ -61,11 +76,16 @@ export function StatsDashboard({ heroStats, trendData, rankings, leaderboard, ex
   return (
     <div className="space-y-6">
       
+      {/* YAZDIRMA (PRINT) İÇİN GİZLİ BAŞLIK */}
+      <div className="hidden print:block mb-8 text-center border-b pb-4">
+        <h1 className="text-3xl font-black text-gray-900">Kurum Sınav İstatistik Raporu</h1>
+        <p className="text-gray-500 mt-2">Rapor Tarihi: {new Date().toLocaleDateString('tr-TR')}</p>
+      </div>
+
       {/* BAŞLIK & İHRACAT */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white/70 backdrop-blur-xl p-5 rounded-2xl border border-gray-100 shadow-sm">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white/70 backdrop-blur-xl p-5 rounded-2xl border border-gray-100 shadow-sm print:hidden">
         <div>
-          <h1 className="text-2xl font-black text-gray-900 tracking-tight">Kurum Komuta Merkezi</h1>
-          <p className="text-sm text-gray-500">Tüm şubeler, sınavlar ve öğrencilerin akademik röntgeni.</p>
+          <h1 className="text-2xl font-black text-gray-900 tracking-tight">Kurum Sınav İstatistikleri</h1>
         </div>
         <div className="flex items-center gap-3">
           <button 
@@ -120,6 +140,7 @@ export function StatsDashboard({ heroStats, trendData, rankings, leaderboard, ex
                 <Tooltip 
                   contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                   cursor={{stroke: '#e2e8f0', strokeWidth: 2}}
+                  formatter={(val: any) => [val, 'Katılım']}
                 />
                 <Line 
                   type="monotone" 
@@ -148,6 +169,7 @@ export function StatsDashboard({ heroStats, trendData, rankings, leaderboard, ex
                 <Tooltip 
                   contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                   cursor={{fill: '#f8fafc'}}
+                  formatter={(val: any) => [val, 'Ortalama Puan']}
                 />
                 <Bar dataKey="average" radius={[0, 6, 6, 0]}>
                   {rankings.map((entry, index) => (
@@ -196,9 +218,23 @@ export function StatsDashboard({ heroStats, trendData, rankings, leaderboard, ex
 
         {/* Yapılan Sınavların Karnesi */}
         <div className="lg:col-span-2 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm print:break-inside-avoid">
-          <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-            <FileSpreadsheet className="w-5 h-5 text-emerald-500" /> Kurum Sınav Karneleri
-          </h3>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-4">
+            <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+              <FileSpreadsheet className="w-5 h-5 text-emerald-500" /> Kurum Sınav Karneleri
+            </h3>
+            <div className="relative w-full sm:w-64 print:hidden">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Search className="h-4 w-4 text-gray-400" />
+              </div>
+              <input
+                type="text"
+                className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl text-sm focus:ring-blue-500 focus:border-blue-500 bg-gray-50/50"
+                placeholder="Sınav ara..."
+                value={searchTerm}
+                onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
+              />
+            </div>
+          </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm text-gray-600">
               <thead className="bg-gray-50 text-gray-700 uppercase text-xs">
@@ -211,9 +247,9 @@ export function StatsDashboard({ heroStats, trendData, rankings, leaderboard, ex
                 </tr>
               </thead>
               <tbody>
-                {exams.length === 0 ? (
-                  <tr><td colSpan={5} className="text-center py-6">Henüz yapılmış sınav yok.</td></tr>
-                ) : exams.map((exam) => (
+                {currentExams.length === 0 ? (
+                  <tr><td colSpan={5} className="text-center py-6">Sonuç bulunamadı.</td></tr>
+                ) : currentExams.map((exam) => (
                   <tr key={exam.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50">
                     <td className="px-4 py-3 font-medium text-gray-900">{exam.title}</td>
                     <td className="px-4 py-3 text-xs">{new Date(exam.date).toLocaleDateString("tr-TR")}</td>
@@ -234,6 +270,30 @@ export function StatsDashboard({ heroStats, trendData, rankings, leaderboard, ex
               </tbody>
             </table>
           </div>
+          
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between mt-4 px-2 print:hidden">
+              <span className="text-sm text-gray-500">
+                Toplam <strong>{filteredExams.length}</strong> sınav
+              </span>
+              <div className="flex gap-1">
+                <button 
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage(p => p - 1)}
+                  className="p-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button 
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage(p => p + 1)}
+                  className="p-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
       </div>
