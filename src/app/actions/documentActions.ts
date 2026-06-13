@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "./authActions";
 import { DocumentType } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 
 export async function getDocuments(type?: DocumentType, query?: string, institutionIdFilter?: string) {
   const user = await getCurrentUser();
@@ -50,6 +51,8 @@ export async function deleteDocument(id: string) {
   // Not: fs.unlink için server action içinde dosya yolu kurgusu yapılmalı.
 
   await prisma.document.delete({ where: { id } });
+
+  revalidatePath("/muro-admin/dokumanlar");
 
   return { success: true };
 }

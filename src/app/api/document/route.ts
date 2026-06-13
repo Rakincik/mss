@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { writeFile } from "fs/promises";
 import path from "path";
 import { prisma } from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 
 import { getCurrentUser } from "@/app/actions/authActions";
 
@@ -51,6 +52,8 @@ export async function POST(req: NextRequest) {
         institutionId: user.role !== "SUPERADMIN" ? user.institutionId : undefined,
       }
     });
+
+    revalidatePath("/muro-admin/dokumanlar");
 
     return NextResponse.json({ success: true, document });
   } catch (err: any) {
