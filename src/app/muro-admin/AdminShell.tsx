@@ -15,25 +15,25 @@ export default function AdminShell({ children, user }: AdminShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
 
-  const NavItem = ({ href, icon: Icon, label, color, activeGradient }: any) => {
+  const NavItem = ({ href, icon: Icon, label, color }: any) => {
     // Tam eşleşme veya alt rotalarda aktiflik durumu
     const isActive = href === "/muro-admin" ? pathname === href : pathname?.startsWith(href);
     
+    const activeBgClass = color.replace('text-', 'bg-').replace('600', '50');
+    const activeTextClass = color.replace('600', '700');
+
     return (
       <Link 
         href={href} 
         onClick={() => setSidebarOpen(false)} 
-        className={`flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-xl transition-all duration-300 group ${
+        className={`flex items-center gap-3 px-3 py-2.5 text-sm font-semibold rounded-xl transition-all group ${
           isActive 
-            ? `bg-gradient-to-r ${activeGradient} text-white shadow-md transform scale-[1.02]` 
-            : `text-slate-600 hover:bg-white hover:shadow-sm hover:translate-x-1 border border-transparent hover:border-slate-200`
+            ? `${activeBgClass} ${activeTextClass}` 
+            : `text-slate-600 hover:${activeBgClass} hover:${activeTextClass}`
         }`}
       >
-        <div className={`p-1.5 rounded-lg transition-colors ${isActive ? 'bg-white/20' : `bg-slate-100 group-hover:${color.replace('text-', 'bg-').replace('600', '100')} group-hover:${color}`}`}>
-          <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-500'}`} />
-        </div>
+        <Icon className={`w-5 h-5 transition-colors ${isActive ? color : 'text-slate-400 group-hover:' + color}`} />
         <span className="flex-1">{label}</span>
-        {isActive && <ChevronRight className="w-4 h-4 text-white/50" />}
       </Link>
     );
   };
@@ -50,14 +50,9 @@ export default function AdminShell({ children, user }: AdminShellProps) {
       )}
 
       {/* Sidebar */}
-      <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-72 bg-slate-50/50 border-r border-slate-200 flex flex-col shadow-[4px_0_24px_rgba(0,0,0,0.02)] transform transition-transform duration-300 ease-in-out print:hidden ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
-        <div className="h-16 flex items-center justify-between px-6 border-b border-slate-200/60 bg-white">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
-              <Activity className="w-5 h-5" />
-            </div>
-            <span className="font-black text-lg tracking-tight text-slate-800">MURO <span className="text-blue-600">LMS</span></span>
-          </div>
+      <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white border-r border-slate-200 flex flex-col shadow-sm transform transition-transform duration-300 ease-in-out print:hidden ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+        <div className="h-16 flex items-center justify-between px-6 border-b border-slate-100">
+          <div></div>
           <button 
             onClick={() => setSidebarOpen(false)}
             className="lg:hidden p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
@@ -66,59 +61,43 @@ export default function AdminShell({ children, user }: AdminShellProps) {
           </button>
         </div>
         
-        <nav className="flex-1 p-4 space-y-1.5 overflow-y-auto custom-scrollbar">
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto custom-scrollbar">
           
-          <div className="flex items-center gap-2 px-3 pb-2 pt-2">
-            <div className="h-px bg-slate-200 flex-1"></div>
-            <span className="text-[9px] uppercase tracking-[0.2em] font-black text-slate-400">Yönetim</span>
-            <div className="h-px bg-slate-200 flex-1"></div>
-          </div>
-          <NavItem href="/muro-admin" icon={LayoutDashboard} label="Dashboard" color="text-blue-600" activeGradient="from-blue-600 to-blue-500 shadow-blue-500/20" />
+          <div className="px-3 pb-2 pt-2 text-[10px] uppercase tracking-widest font-bold text-slate-400">Yönetim</div>
+          <NavItem href="/muro-admin" icon={LayoutDashboard} label="Dashboard" color="text-blue-600" />
 
           {user.role !== "MUHASEBE" && (
             <>
-              <NavItem href="/muro-admin/sinavlar" icon={BookOpen} label="Sınavlar" color="text-purple-600" activeGradient="from-purple-600 to-purple-500 shadow-purple-500/20" />
+              <NavItem href="/muro-admin/sinavlar" icon={BookOpen} label="Sınavlar" color="text-purple-600" />
               
-              <div className="flex items-center gap-2 px-3 pb-2 pt-4">
-                <div className="h-px bg-slate-200 flex-1"></div>
-                <span className="text-[9px] uppercase tracking-[0.2em] font-black text-slate-400">Kullanıcılar</span>
-                <div className="h-px bg-slate-200 flex-1"></div>
-              </div>
-              <NavItem href="/muro-admin/ogrenciler" icon={Users} label="Öğrenciler" color="text-indigo-600" activeGradient="from-indigo-600 to-indigo-500 shadow-indigo-500/20" />
-              <NavItem href="/muro-admin/gruplar" icon={Users} label="Gruplar" color="text-amber-600" activeGradient="from-amber-500 to-amber-400 shadow-amber-500/20" />
+              <div className="px-3 pt-4 pb-2 text-[10px] uppercase tracking-widest font-bold text-slate-400">Kullanıcılar</div>
+              <NavItem href="/muro-admin/ogrenciler" icon={Users} label="Öğrenciler" color="text-indigo-600" />
+              <NavItem href="/muro-admin/gruplar" icon={Users} label="Gruplar" color="text-amber-600" />
               
-              <div className="flex items-center gap-2 px-3 pb-2 pt-4">
-                <div className="h-px bg-slate-200 flex-1"></div>
-                <span className="text-[9px] uppercase tracking-[0.2em] font-black text-slate-400">İçerik Arşivi</span>
-                <div className="h-px bg-slate-200 flex-1"></div>
-              </div>
-              <NavItem href="/muro-admin/dokumanlar" icon={BookOpen} label="Doküman Arşivi" color="text-pink-600" activeGradient="from-pink-600 to-pink-500 shadow-pink-500/20" />
+              <div className="px-3 pt-4 pb-2 text-[10px] uppercase tracking-widest font-bold text-slate-400">İçerik Arşivi</div>
+              <NavItem href="/muro-admin/dokumanlar" icon={BookOpen} label="Doküman Arşivi" color="text-pink-600" />
               
-              <div className="flex items-center gap-2 px-3 pb-2 pt-4">
-                <div className="h-px bg-slate-200 flex-1"></div>
-                <span className="text-[9px] uppercase tracking-[0.2em] font-black text-slate-400">Sistem</span>
-                <div className="h-px bg-slate-200 flex-1"></div>
-              </div>
+              <div className="px-3 pt-4 pb-2 text-[10px] uppercase tracking-widest font-bold text-slate-400">Sistem</div>
               {user.role === "SUPERADMIN" && (
-                <NavItem href="/muro-admin/kurumlar" icon={Building2} label="Kurumlar (Tenant)" color="text-cyan-600" activeGradient="from-cyan-600 to-cyan-500 shadow-cyan-500/20" />
+                <NavItem href="/muro-admin/kurumlar" icon={Building2} label="Kurumlar (Tenant)" color="text-cyan-600" />
               )}
-              <NavItem href="/muro-admin/istatistikler" icon={BarChart3} label="İstatistikler" color="text-orange-600" activeGradient="from-orange-500 to-orange-400 shadow-orange-500/20" />
-              <NavItem href="/muro-admin/guvenlik" icon={ShieldAlert} label="Güvenlik Logları" color="text-rose-600" activeGradient="from-rose-600 to-rose-500 shadow-rose-500/20" />
+              <NavItem href="/muro-admin/istatistikler" icon={BarChart3} label="İstatistikler" color="text-orange-600" />
+              <NavItem href="/muro-admin/guvenlik" icon={ShieldAlert} label="Güvenlik Logları" color="text-rose-600" />
             </>
           )}
           
           {user.role !== "ASISTAN" && (
             <div className="pt-2">
-              <NavItem href="/muro-admin/muhasebe" icon={DollarSign} label="Muhasebe Modülü" color="text-emerald-600" activeGradient="from-emerald-600 to-emerald-500 shadow-emerald-500/20" />
+              <NavItem href="/muro-admin/muhasebe" icon={DollarSign} label="Muhasebe Modülü" color="text-emerald-600" />
             </div>
           )}
         </nav>
 
-        <div className="p-4 bg-white border-t border-slate-200/60">
+        <div className="p-4 border-t border-slate-100 bg-slate-50/50">
           <form action={logoutUser}>
-            <button type="submit" className="w-full flex items-center justify-center gap-2 px-3 py-2.5 text-sm font-bold text-rose-600 hover:text-white bg-rose-50 border border-rose-100 hover:bg-rose-600 hover:border-rose-600 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md hover:shadow-rose-500/20 group">
-              <LogOut className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-              <span>Sistemden Çıkış Yap</span>
+            <button type="submit" className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-bold text-rose-600 hover:text-rose-700 bg-rose-50 border border-rose-200 hover:border-rose-300 rounded-xl transition-all shadow-sm hover:shadow">
+              <LogOut className="w-4 h-4" />
+              <span>Güvenli Çıkış Yap</span>
             </button>
           </form>
         </div>
