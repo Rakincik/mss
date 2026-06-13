@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Plus, Trash2, Calculator, Layers, BookOpen, Edit2, AlertTriangle, X, BarChart, Search } from "lucide-react";
 import { getPackages, createPackage, deletePackage, calculatePackageScores, updatePackage } from "@/app/actions/packageActions";
 import Link from "next/link";
+import { useToast } from "@/hooks/useToast";
 
 export default function PackageExams({ allExams, allGroups = [] }: { allExams: any[], allGroups?: any[] }) {
   const [packages, setPackages] = useState<any[]>([]);
@@ -13,8 +14,9 @@ export default function PackageExams({ allExams, allGroups = [] }: { allExams: a
   const [calculatingId, setCalculatingId] = useState<string | null>(null);
   const [editPackageId, setEditPackageId] = useState<string | null>(null);
   const [deletePackageId, setDeletePackageId] = useState<string | null>(null);
+  const { showToast } = useToast();
 
-  const [formData, setFormData] = useState({ title: "", description: "", isSequential: false });
+  const [formData, setFormData] = useState({ title: "", description: "", isSequential: false, showResultsTime: "" });
   const [selectedExams, setSelectedExams] = useState<string[]>([]);
   const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
   const [examSearchTerm, setExamSearchTerm] = useState("");
@@ -34,7 +36,7 @@ export default function PackageExams({ allExams, allGroups = [] }: { allExams: a
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedExams.length === 0) {
-      alert("Lütfen pakete en az bir sınav ekleyin.");
+      showToast("Lütfen pakete en az bir sınav ekleyin.", "error");
       return;
     }
     setSaving(true);
@@ -49,14 +51,13 @@ export default function PackageExams({ allExams, allGroups = [] }: { allExams: a
     if (res.success) {
       setShowModal(false);
       setEditPackageId(null);
-      setFormData({ title: "", description: "", isSequential: false });
+      setFormData({ title: "", description: "", isSequential: false, showResultsTime: "" });
       setSelectedExams([]);
       setSelectedGroups([]);
-      setExamSearchTerm("");
       setGroupSearchTerm("");
       fetchPackages();
     } else {
-      alert("Hata: " + res.error);
+      showToast("Hata: " + res.error, "error");
     }
     setSaving(false);
   };
@@ -66,10 +67,10 @@ export default function PackageExams({ allExams, allGroups = [] }: { allExams: a
     setCalculatingId(pkgId);
     const res = await calculatePackageScores(pkgId);
     if (res.success) {
-      alert("Puanlar başarıyla hesaplandı ve karneler üretildi!");
+      showToast("Puanlar başarıyla hesaplandı ve karneler üretildi!", "success");
       fetchPackages();
     } else {
-      alert("Hata: " + res.error);
+      showToast("Hata: " + res.error, "error");
     }
     setCalculatingId(null);
   };
@@ -86,7 +87,7 @@ export default function PackageExams({ allExams, allGroups = [] }: { allExams: a
         <button 
           onClick={() => {
             setEditPackageId(null);
-            setFormData({ title: "", description: "", isSequential: false });
+            setFormData({ title: "", description: "", isSequential: false, showResultsTime: "" });
             setSelectedExams([]);
             setSelectedGroups([]);
             setExamSearchTerm("");
@@ -117,7 +118,7 @@ export default function PackageExams({ allExams, allGroups = [] }: { allExams: a
                 <button 
                   onClick={() => {
                     setEditPackageId(pkg.id);
-                    setFormData({ title: pkg.title, description: pkg.description || "", isSequential: pkg.isSequential || false });
+                    setFormData({ title: pkg.title, description: pkg.description || "", isSequential: pkg.isSequential || false, showResultsTime: pkg.showResultsTime ? new Date(pkg.showResultsTime).toISOString().slice(0, 16) : "" });
                     setSelectedExams(pkg.exams.map((e:any) => e.id));
                     setSelectedGroups(pkg.groups ? pkg.groups.map((g:any) => g.id) : []);
                     setExamSearchTerm("");
@@ -185,6 +186,10 @@ export default function PackageExams({ allExams, allGroups = [] }: { allExams: a
               <div>
                 <label className="block text-xs font-bold text-slate-500 mb-1">Açıklama</label>
                 <textarea value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} className="w-full border p-3 rounded-xl outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all text-sm"></textarea>
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-500 mb-1">Paket Karnesi Açıklanma Tarihi (Opsiyonel)</label>
+                <input type="datetime-local" value={formData.showResultsTime} onChange={e => setFormData({...formData, showResultsTime: e.target.value})} className="w-full border p-3 rounded-xl outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all text-sm font-bold text-slate-600" />
               </div>
               <div>
                 <label className="block text-xs font-bold text-slate-500 mb-2">Pakete Dahil Edilecek Oturumlar (Sınavlar)</label>

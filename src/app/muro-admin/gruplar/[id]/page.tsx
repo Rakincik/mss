@@ -7,8 +7,10 @@ import { getExams } from "@/app/actions/examActions";
 import * as xlsx from "xlsx";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useToast } from "@/hooks/useToast";
 
 export default function GroupDetailPage() {
+  const { showToast } = useToast();
   const { id } = useParams();
   const [group, setGroup] = useState<any>(null);
   const [allExams, setAllExams] = useState<any[]>([]);
@@ -284,7 +286,7 @@ export default function GroupDetailPage() {
                     setSelectedExamId("");
                     fetchData();
                   } catch (error: any) {
-                    alert("Hata: " + error.message);
+                    showToast("Hata: " + error.message, "error");
                   }
                 }}
                 className="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 py-3.5 rounded-xl text-white font-bold transition-all shadow-md active:scale-95 flex items-center justify-center gap-2"
@@ -362,7 +364,7 @@ export default function GroupDetailPage() {
                         setSelectedStudentIds([]);
                         fetchData();
                       } catch (error: any) {
-                        alert("Hata: " + error.message);
+                        showToast("Hata: " + error.message, "error");
                       }
                     }}
                     className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 px-6 py-2.5 rounded-xl text-white font-bold transition-all shadow-md active:scale-95"

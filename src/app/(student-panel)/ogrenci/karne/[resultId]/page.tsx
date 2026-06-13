@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/app/actions/authActions";
 import { redirect } from "next/navigation";
 import { CheckCircle2, XCircle, MinusCircle, FileText, Target, BookOpen, Clock, Activity, Home, Trophy, PlayCircle } from "lucide-react";
 import Link from "next/link";
+import PrintButton from "@/components/ui/PrintButton";
 
 export default async function SınavKarnesiPage({ params }: { params: Promise<{ resultId: string }> }) {
   const resolvedParams = await params;
@@ -182,8 +183,9 @@ export default async function SınavKarnesiPage({ params }: { params: Promise<{ 
             </div>
             
             <div className="flex gap-4">
+              <PrintButton />
               {result.exam.solutionPdfUrl && (
-                <Link href={`/ogrenci/karne/${result.id}/cozum`} className="flex items-center gap-2 px-5 py-2.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 rounded-xl font-bold transition-colors shadow-sm text-sm">
+                <Link href={`/ogrenci/karne/${result.id}/cozum`} className="flex items-center gap-2 px-5 py-2.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 rounded-xl font-bold transition-colors shadow-sm text-sm print:hidden">
                   <FileText className="w-4 h-4 text-emerald-500" /> Çözüm Kitapçığı & Optiğim
                 </Link>
               )}

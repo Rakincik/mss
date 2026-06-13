@@ -20,13 +20,14 @@ export async function getPackages() {
   }
 }
 
-export async function createPackage(data: { title: string, description?: string, examIds: string[], groupIds: string[], isSequential?: boolean }) {
+export async function createPackage(data: { title: string, description?: string, examIds: string[], groupIds: string[], isSequential?: boolean, showResultsTime?: string }) {
   try {
     const newPackage = await prisma.examPackage.create({
       data: {
         title: data.title,
         description: data.description,
         isSequential: data.isSequential || false,
+        showResultsTime: data.showResultsTime ? new Date(data.showResultsTime) : null,
         exams: {
           connect: data.examIds.map(id => ({ id }))
         },
@@ -43,7 +44,7 @@ export async function createPackage(data: { title: string, description?: string,
   }
 }
 
-export async function updatePackage(packageId: string, data: { title: string, description?: string, examIds: string[], groupIds: string[], isSequential?: boolean }) {
+export async function updatePackage(packageId: string, data: { title: string, description?: string, examIds: string[], groupIds: string[], isSequential?: boolean, showResultsTime?: string }) {
   try {
     const updatedPackage = await prisma.examPackage.update({
       where: { id: packageId },
@@ -51,6 +52,7 @@ export async function updatePackage(packageId: string, data: { title: string, de
         title: data.title,
         description: data.description,
         isSequential: data.isSequential !== undefined ? data.isSequential : false,
+        showResultsTime: data.showResultsTime ? new Date(data.showResultsTime) : null,
         exams: {
           set: data.examIds.map(id => ({ id }))
         },
@@ -89,7 +91,7 @@ export async function calculatePackageScores(packageId: string) {
     // 1. Fetch package and its exams
     const pkg = await prisma.examPackage.findUnique({
       where: { id: packageId },
-      include: { exams: { include: { results: true } } }
+      include: { exams: { include: { results: { where: { isFinished: true } } } } }
     });
     
     if (!pkg) throw new Error("Paket bulunamadı");

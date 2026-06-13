@@ -8,8 +8,10 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { getExams } from "@/app/actions/examActions";
+import { useToast } from "@/hooks/useToast";
 
 export default function StudentCRMProfile({ params }: { params: Promise<{ id: string }> }) {
+  const { showToast } = useToast();
   const resolvedParams = use(params);
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -52,7 +54,7 @@ export default function StudentCRMProfile({ params }: { params: Promise<{ id: st
       // Profil verisini güncellemek için yeniden load
       loadData();
     } catch(err: any) {
-      alert("Hata: " + err.message);
+      showToast("Hata: " + err.message, "error");
     } finally {
       setIsUpdatingRole(false);
     }

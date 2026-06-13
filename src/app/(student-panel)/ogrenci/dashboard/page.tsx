@@ -5,6 +5,7 @@ import { BookOpen, Clock, Activity, Zap, CheckCircle2, Target, PlayCircle, Lock 
 import Link from "next/link";
 import dayjs from "dayjs";
 import 'dayjs/locale/tr';
+dayjs.locale('tr');
 
 export const dynamic = "force-dynamic";
 
@@ -119,7 +120,6 @@ export default async function StudentDashboardPage() {
             <div className="relative flex items-center justify-between flex-wrap gap-4">
                 <div className="space-y-1">
                     <div className="flex items-center gap-2 text-white/60 text-sm">
-                        <Zap className="h-4 w-4 text-amber-400" />
                         İyi çalışmalar
                     </div>
                     <h1 className="text-2xl font-bold">{student.name}, bugün hangi denemeyi çözelim?</h1>
@@ -131,7 +131,7 @@ export default async function StudentDashboardPage() {
                              <BookOpen className="h-4 w-4 text-blue-300" />
                         </div>
                         <div>
-                             <p className="text-[10px] text-white/50 uppercase tracking-widest">Atanmış</p>
+                             <p className="text-[10px] text-white/50 uppercase tracking-widest">Tanımlanan</p>
                              <p className="text-sm font-bold">{singleExams.length + packages.length} İçerik</p>
                         </div>
                     </div>
@@ -156,6 +156,9 @@ export default async function StudentDashboardPage() {
             <div className="grid grid-cols-1 gap-6">
               {packages.map(pkg => {
                 const isComputed = pkg.results && pkg.results.length > 0 && pkg.results[0].isComputed;
+                const isResultsPublished = !pkg.showResultsTime || new Date() >= new Date(pkg.showResultsTime);
+                const canSeeResults = isComputed && isResultsPublished;
+                
                 return (
                   <div key={pkg.id} className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
                     <div className="flex justify-between items-start mb-4">
@@ -172,10 +175,18 @@ export default async function StudentDashboardPage() {
                           </div>
                         )}
                       </div>
-                      {isComputed && (
+                      {isComputed && !isResultsPublished && (
+                        <div className="flex flex-col items-end">
+                           <span className="px-4 py-1.5 bg-amber-100 text-amber-700 border border-amber-200 rounded-lg font-bold tracking-wider mb-2 text-[10px] uppercase">Sonuçlar Bekleniyor</span>
+                           <span className="px-5 py-2 bg-slate-100 text-slate-500 rounded-lg text-xs font-bold shadow-sm">
+                             {dayjs(pkg.showResultsTime).format("DD MMM HH:mm")}'de Açıklanacak
+                           </span>
+                        </div>
+                      )}
+                      {canSeeResults && (
                         <div className="flex flex-col items-end">
                            <span className="px-4 py-1.5 bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-lg font-bold tracking-wider mb-2 text-[10px] uppercase">Karneniz Hazır</span>
-                           <Link href={`/ogrenci/karneler/paket/${pkg.id}`} className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-bold transition shadow-sm">Birleşik Karneyi Gör</Link>
+                           <Link href={`/ogrenci/karneler/paket/${pkg.id}`} className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-bold transition shadow-sm">Sonuç Karnemi Gör</Link>
                         </div>
                       )}
                     </div>

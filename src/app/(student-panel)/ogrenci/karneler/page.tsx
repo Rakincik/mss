@@ -5,6 +5,7 @@ import { FileText, Target, CalendarDays, CheckCircle2, Clock, Lock } from "lucid
 import Link from "next/link";
 import dayjs from "dayjs";
 import 'dayjs/locale/tr';
+dayjs.locale('tr');
 
 export const dynamic = "force-dynamic";
 

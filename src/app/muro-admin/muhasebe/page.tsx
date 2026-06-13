@@ -7,8 +7,10 @@ import {
   PieChart, Pie, Cell
 } from "recharts";
 import { TrendingUp, TrendingDown, DollarSign, ShoppingBag, Activity, Download, Calendar, Undo2, AlertCircle } from "lucide-react";
+import { useToast } from "@/hooks/useToast";
 
 export default function MuhasebeDashboard() {
+  const { showToast } = useToast();
   const [stats, setStats] = useState<any>(null);
   const [chartData, setChartData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -82,13 +84,13 @@ export default function MuhasebeDashboard() {
     try {
       const res = await refundTransaction(txId);
       if (res.success) {
-        alert("İade işlemi başarıyla oluşturuldu.");
+        showToast("İade işlemi başarıyla oluşturuldu.", "success");
         loadData();
       } else {
-        alert("Hata: " + res.error);
+        showToast("Hata: " + res.error, "error");
       }
     } catch (err: any) {
-      alert("Hata: " + err.message);
+      showToast("Hata: " + err.message, "error");
     } finally {
       setIsRefunding(null);
     }

@@ -13,9 +13,9 @@ export default async function StudentPanelLayout({ children }: { children: React
   }
 
   return (
-    <div className="flex h-screen bg-slate-50 font-sans text-slate-800 overflow-hidden">
+    <div className="flex h-screen print:h-auto bg-slate-50 font-sans text-slate-800 overflow-hidden print:overflow-visible">
       {/* Sidebar */}
-      <aside className="w-72 bg-white flex flex-col border-r border-slate-200 shrink-0 shadow-sm z-20 relative">
+      <aside className="w-72 bg-white flex flex-col border-r border-slate-200 shrink-0 shadow-sm z-20 relative print:hidden">
         {/* Logo & Brand */}
         <div className="h-24 flex items-center px-8 shrink-0">
           <Link href="/ogrenci/dashboard" className="flex items-center gap-3 group">
@@ -86,7 +86,7 @@ export default async function StudentPanelLayout({ children }: { children: React
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col bg-slate-50 relative overflow-y-auto">
+      <main className="flex-1 flex flex-col bg-slate-50 print:bg-white relative overflow-y-auto print:overflow-visible">
         <div className="relative z-10 p-4 md:p-8 min-h-full">
           {children}
         </div>

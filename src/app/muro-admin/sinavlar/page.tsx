@@ -7,8 +7,10 @@ import { getExams, createExam, deleteExam, saveQuestionKeys, updateExamDetails, 
 import { getGroups } from "@/app/actions/userActions";
 import { getDocuments } from "@/app/actions/documentActions";
 import PackageExams from "@/components/admin/PackageExams";
+import { useToast } from "@/hooks/useToast";
 
 export default function SinavlarPage() {
+  const { showToast } = useToast();
   const [activeTab, setActiveTab] = useState<'exams' | 'packages'>('exams');
   const [exams, setExams] = useState<any[]>([]);
   const [groups, setGroups] = useState<any[]>([]);
@@ -60,7 +62,7 @@ export default function SinavlarPage() {
     const startStr = formData.get("startTime") as string;
     const endStr = formData.get("endTime") as string;
     if (startStr && endStr && new Date(startStr) >= new Date(endStr)) {
-      alert("Sınav bitiş tarihi, başlama tarihinden önce olamaz!");
+      showToast("Sınav bitiş tarihi, başlama tarihinden önce olamaz!", "error");
       setSavingExam(false);
       return;
     }
@@ -79,7 +81,7 @@ export default function SinavlarPage() {
       setEditStep(1);
       fetchData();
     } catch (err: any) {
-      alert("Hata: " + err.message);
+      showToast("Hata: " + err.message, "error");
     } finally {
       setSavingExam(false);
     }
@@ -113,7 +115,7 @@ export default function SinavlarPage() {
       await toggleExamResultsStatus(exam.id, exam.isResultsPublished);
       fetchData();
     } catch (e) {
-      alert("Durum değiştirilirken hata oluştu.");
+      showToast("Durum değiştirilirken hata oluştu.", "error");
     }
   };
 
@@ -122,7 +124,7 @@ export default function SinavlarPage() {
       await toggleExamActiveStatus(exam.id, exam.isActive);
       fetchData();
     } catch (e) {
-      alert("Aktif/Pasif durumu değiştirilirken hata oluştu.");
+      showToast("Aktif/Pasif durumu değiştirilirken hata oluştu.", "error");
     }
   };
 
@@ -171,7 +173,7 @@ export default function SinavlarPage() {
     const startStr = formData.get("startTime") as string;
     const endStr = formData.get("endTime") as string;
     if (startStr && endStr && new Date(startStr) >= new Date(endStr)) {
-      alert("Sınav bitiş tarihi, başlama tarihinden önce olamaz!");
+      showToast("Sınav bitiş tarihi, başlama tarihinden önce olamaz!", "error");
       setSavingExam(false);
       return;
     }
@@ -195,7 +197,7 @@ export default function SinavlarPage() {
       setSectionsBuilder([{id: Date.now().toString(), title: "Genel Test", count: 40, points: 1.0}]);
       fetchData();
     } catch (err: any) {
-      alert("Hata: " + err.message);
+      showToast("Hata: " + err.message, "error");
     } finally {
       setSavingExam(false);
     }
@@ -256,7 +258,7 @@ export default function SinavlarPage() {
       setSelectedExamForKeys(null);
       fetchData();
     } catch (err) {
-      alert("Hata oluştu.");
+      showToast("Hata oluştu.", "error");
     } finally {
       setSavingKeys(false);
     }
@@ -755,7 +757,7 @@ export default function SinavlarPage() {
                               }
                               setCreateWizardKeys(copy);
                               e.target.value = "";
-                              alert("Katsayılar uygulandı!");
+                              showToast("Katsayılar uygulandı!", "success");
                             }
                           }}
                           onKeyDown={(e) => {
@@ -1208,7 +1210,7 @@ export default function SinavlarPage() {
                               }
                               setKeysState(copy);
                               e.target.value = "";
-                              alert("Katsayılar uygulandı!");
+                              showToast("Katsayılar uygulandı!", "success");
                             }
                           }}
                           onKeyDown={(e) => {

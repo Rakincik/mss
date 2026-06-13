@@ -2,11 +2,15 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { Users, Plus, Trash2, X, ChevronRight, ChevronDown, Search, Layers, ShieldCheck, GraduationCap, RefreshCw, Copy, Edit2, Calendar, BookOpen, Settings, AlertTriangle } from "lucide-react";
-import { getGroups, getGroupStats, createGroup, deleteGroup, toggleGroupStatus, getGroupDetails, updateGroup, bulkRemoveFromGroup, bulkTransferToGroup } from "@/app/actions/userActions";
+import { getGroups, getGroupStats, createGroup, deleteGroup, toggleGroupStatus, getGroupDetails, updateGroup, bulkRemoveFromGroup, bulkTransferToGroup, getUsers, bulkAssignStudents } from "@/app/actions/userActions";
 import Link from "next/link";
 import dayjs from "dayjs";
+import 'dayjs/locale/tr';
+dayjs.locale('tr');
+import { useToast } from "@/hooks/useToast";
 
 export default function GruplarPage() {
+  const { showToast } = useToast();
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
   
@@ -30,6 +34,11 @@ export default function GruplarPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [creatingSubgroupFor, setCreatingSubgroupFor] = useState<string | null>(null);
   const [showTransferModal, setShowTransferModal] = useState(false);
+  const [showAddStudentModal, setShowAddStudentModal] = useState(false);
+  const [studentSearchQuery, setStudentSearchQuery] = useState("");
+  const [availableStudents, setAvailableStudents] = useState<any[]>([]);
+  const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>([]);
+  const [isSearchingStudents, setIsSearchingStudents] = useState(false);
 
   const fetchData = async () => {
     setLoading(true);
@@ -71,6 +80,27 @@ export default function GruplarPage() {
     setDetailsLoading(false);
   };
 
+  useEffect(() => {
+    if (!showAddStudentModal) return;
+    const fetchStudents = async () => {
+      setIsSearchingStudents(true);
+      try {
+        const res = await getUsers({ role: "STUDENT", status: "active", search: studentSearchQuery, pageSize: 50 });
+        // Filtrele: Zaten grupta olanları çıkar
+        const existingIds = groupDetails?.users?.map((u: any) => u.id) || [];
+        setAvailableStudents(res.users.filter(u => !existingIds.includes(u.id)));
+      } catch (error) {
+        console.error(error);
+      }
+      setIsSearchingStudents(false);
+    };
+
+    const timer = setTimeout(() => {
+      fetchStudents();
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [studentSearchQuery, showAddStudentModal, groupDetails]);
+
   const handleCreateGroup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -85,7 +115,7 @@ export default function GruplarPage() {
       setCreatingSubgroupFor(null);
       fetchData();
     } catch (error: any) {
-      alert(error.message);
+      showToast(error.message, "error");
     }
   };
 
@@ -101,11 +131,11 @@ export default function GruplarPage() {
         price: Number(formData.get("price") || 0),
         expireAt: dateStr ? new Date(dateStr) : null
       });
-      alert("Başarıyla güncellendi!");
+      showToast("Başarıyla güncellendi!", "success");
       loadGroupDetails(groupDetails.id);
       fetchData();
     } catch (error: any) {
-      alert(error.message);
+      showToast(error.message, "error");
     }
   };
 
@@ -116,7 +146,7 @@ export default function GruplarPage() {
       loadGroupDetails(groupDetails.id);
       fetchData();
     } catch (e: any) {
-      alert(e.message);
+      showToast(e.message, "error");
     }
   };
 
@@ -128,7 +158,7 @@ export default function GruplarPage() {
       setSelectedGroupId(null);
       fetchData();
     } catch (e: any) {
-      alert(e.message);
+      showToast(e.message, "error");
     }
   };
 
@@ -141,7 +171,21 @@ export default function GruplarPage() {
       loadGroupDetails(groupDetails.id);
       fetchData(); // For updating user count
     } catch (e: any) {
-      alert(e.message);
+      showToast(e.message, "error");
+    }
+  };
+
+  const handleAddStudentsToGroup = async () => {
+    if (!groupDetails || selectedStudentIds.length === 0) return;
+    try {
+      await bulkAssignStudents(groupDetails.id, selectedStudentIds);
+      setShowAddStudentModal(false);
+      setSelectedStudentIds([]);
+      setStudentSearchQuery("");
+      loadGroupDetails(groupDetails.id);
+      fetchData(); // İstatistikler için
+    } catch (e: any) {
+      showToast(e.message, "error");
     }
   };
 
@@ -150,7 +194,10 @@ export default function GruplarPage() {
     if (!groupDetails || selectedUsers.length === 0) return;
     const formData = new FormData(e.currentTarget);
     const targetGroupId = formData.get("targetGroupId") as string;
-    if (!targetGroupId) return alert("Lütfen bir hedef grup seçin.");
+    if (!targetGroupId) {
+      showToast("Lütfen bir hedef grup seçin.", "error");
+      return;
+    }
     
     try {
       await bulkTransferToGroup(groupDetails.id, targetGroupId, selectedUsers);
@@ -159,7 +206,7 @@ export default function GruplarPage() {
       loadGroupDetails(groupDetails.id);
       fetchData();
     } catch (e: any) {
-      alert(e.message);
+      showToast(e.message, "error");
     }
   };
 
@@ -366,7 +413,7 @@ export default function GruplarPage() {
                   </div>
                   
                   <div className="flex items-center gap-2">
-                    <button onClick={() => { navigator.clipboard.writeText(groupDetails.id); alert("Grup ID kopyalandı!"); }} className="p-2 text-slate-400 hover:text-slate-700 bg-white hover:bg-slate-100 rounded-lg border border-slate-200 shadow-sm transition-colors" title="ID Kopyala">
+                    <button onClick={() => { navigator.clipboard.writeText(groupDetails.id); showToast("Grup ID kopyalandı!", "success"); }} className="p-2 text-slate-400 hover:text-slate-700 bg-white hover:bg-slate-100 rounded-lg border border-slate-200 shadow-sm transition-colors" title="ID Kopyala">
                       <Copy className="w-4 h-4" />
                     </button>
                     {!groupDetails.parentId && (
@@ -421,9 +468,14 @@ export default function GruplarPage() {
                           </div>
                         )}
                       </div>
-                      <Link href="/muro-admin/ogrenciler" className="flex items-center gap-2 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg transition-colors font-bold shadow-md text-xs">
-                        <Users className="w-4 h-4" /> Üye Yönetimine Git
-                      </Link>
+                      <div className="flex items-center gap-2">
+                        <button onClick={() => setShowAddStudentModal(true)} className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-bold shadow-md text-xs">
+                          <Plus className="w-4 h-4" /> Öğrenci Ekle
+                        </button>
+                        <Link href="/muro-admin/ogrenciler" className="flex items-center gap-2 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg transition-colors font-bold shadow-md text-xs hidden sm:flex">
+                          <Users className="w-4 h-4" /> Üye Yönetimi
+                        </Link>
+                      </div>
                     </div>
 
                     <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
@@ -656,6 +708,74 @@ export default function GruplarPage() {
               </div>
               <button type="submit" className="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition-colors">Aktarımı Başlat</button>
             </form>
+          </div>
+        </div>
+      )}
+      {/* ADD STUDENT MODAL */}
+      {showAddStudentModal && (
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl w-full max-w-2xl shadow-2xl p-8 relative animate-in zoom-in-95 max-h-[90vh] flex flex-col">
+            <button onClick={() => { setShowAddStudentModal(false); setSelectedStudentIds([]); setStudentSearchQuery(""); }} className="absolute top-6 right-6 text-slate-400 hover:bg-slate-100 p-2 rounded-full"><X className="w-5 h-5"/></button>
+            <h2 className="text-xl font-bold mb-1">Gruba Öğrenci Ekle</h2>
+            <p className="text-sm text-slate-500 mb-6">"{groupDetails?.name}" grubuna atamak istediğiniz öğrencileri seçin.</p>
+
+            <div className="relative mb-4">
+              <Search className="w-5 h-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input 
+                type="text"
+                placeholder="İsim, email veya telefon ara..."
+                value={studentSearchQuery}
+                onChange={(e) => setStudentSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 text-sm font-medium transition-colors"
+              />
+            </div>
+
+            <div className="flex-1 overflow-y-auto min-h-[300px] border border-slate-200 rounded-xl mb-4 custom-scrollbar">
+              {isSearchingStudents ? (
+                <div className="flex items-center justify-center h-full py-10">
+                  <RefreshCw className="w-6 h-6 animate-spin text-blue-500" />
+                </div>
+              ) : availableStudents.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-full text-slate-500 p-6 text-center py-10">
+                  <Users className="w-8 h-8 mb-2 opacity-20" />
+                  <p className="text-sm font-medium">Eklenecek uygun öğrenci bulunamadı veya arama kriterinize eşleşen kimse yok.</p>
+                </div>
+              ) : (
+                <div className="divide-y divide-slate-100">
+                  {availableStudents.map(student => (
+                    <label key={student.id} className="flex items-center gap-3 p-3 hover:bg-slate-50 cursor-pointer transition-colors">
+                      <input 
+                        type="checkbox"
+                        checked={selectedStudentIds.includes(student.id)}
+                        onChange={(e) => {
+                          if (e.target.checked) setSelectedStudentIds(prev => [...prev, student.id]);
+                          else setSelectedStudentIds(prev => prev.filter(id => id !== student.id));
+                        }}
+                        className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-600 shrink-0 border border-slate-200">
+                        {student.name ? student.name.substring(0,2).toUpperCase() : "U"}
+                      </div>
+                      <div className="flex flex-col flex-1 min-w-0">
+                        <span className="text-sm font-bold text-slate-800 truncate">{student.name || "İsimsiz"}</span>
+                        <span className="text-[11px] text-slate-500 truncate">{student.email}</span>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-center justify-between pt-2">
+              <span className="text-sm font-bold text-slate-600">{selectedStudentIds.length} öğrenci seçildi</span>
+              <button 
+                onClick={handleAddStudentsToGroup}
+                disabled={selectedStudentIds.length === 0}
+                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-blue-600/20"
+              >
+                Seçilileri Ekle
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -6,6 +6,7 @@ import Link from "next/link";
 import * as XLSX from "xlsx";
 import { getGroups, getUsers, getUserStats, createStudent, deleteStudent, importStudentsExcel, toggleUserStatus, bulkAssignStudents, bulkDeleteStudents, updateStudent, bulkToggleUserStatus } from "@/app/actions/userActions";
 import { getCurrentUser } from "@/app/actions/authActions";
+import { useToast } from "@/hooks/useToast";
 
 // Rol etiketleri ve renkleri
 const ROLE_LABELS: Record<string, { label: string; color: string; dot: string }> = {
@@ -18,6 +19,7 @@ const ROLE_LABELS: Record<string, { label: string; color: string; dot: string }>
 };
 
 export default function OgrencilerPage() {
+  const { showToast } = useToast();
   const [filterRole, setFilterRole] = useState<string>("all");
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -97,7 +99,7 @@ export default function OgrencilerPage() {
       setNewStudentGroup("");
       fetchData();
     } catch (error: any) {
-      alert(error.message);
+      showToast(error.message, "error");
     }
   };
 
@@ -118,7 +120,7 @@ export default function OgrencilerPage() {
       setEditingUser(null);
       fetchData();
     } catch (error: any) {
-      alert(error.message);
+      showToast(error.message, "error");
     }
   };
 
@@ -145,7 +147,7 @@ export default function OgrencilerPage() {
       setSelectedUsers([]);
       fetchData();
     } catch (error: any) {
-      alert(error.message);
+      showToast(error.message, "error");
     }
   };
 
@@ -157,7 +159,7 @@ export default function OgrencilerPage() {
       setShowBulkDeleteModal(false);
       fetchData();
     } catch (error: any) {
-      alert(error.message);
+      showToast(error.message, "error");
     }
   };
   
@@ -171,17 +173,17 @@ export default function OgrencilerPage() {
     const formData = new FormData(e.currentTarget);
     try {
       const res = await importStudentsExcel(formData);
-      alert(`${res.count} öğrenci başarıyla yüklendi.`);
+      showToast(`${res.count} öğrenci başarıyla yüklendi.`, "success");
       setShowExcelModal(false);
       fetchData();
     } catch (err: any) {
-      alert("Excel yükleme hatası: " + err.message);
+      showToast("Excel yükleme hatası: " + err.message, "error");
     }
   };
 
   const handleExportExcel = () => {
     if (users.length === 0) {
-      alert("Dışa aktarılacak kullanıcı bulunamadı!");
+      showToast("Dışa aktarılacak kullanıcı bulunamadı!", "error");
       return;
     }
     const exportData = users.map(u => ({

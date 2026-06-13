@@ -7,6 +7,7 @@ import "react-pdf/dist/Page/TextLayer.css";
 import { Clock, ShieldAlert, CheckCircle2, ChevronLeft, ChevronRight, Maximize, Minimize, Pen, Highlighter, Eraser, Move, Trash2, FileText, ListChecks, WifiOff, ZoomIn, ZoomOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { ExamTimer } from "./ExamTimer";
+import { useToast } from "@/hooks/useToast";
 import dynamic from 'next/dynamic';
 
 const DrawingCanvas = dynamic(() => import('./DrawingCanvas').then(mod => mod.DrawingCanvas), { ssr: false });
@@ -31,6 +32,7 @@ const MAX_DRAWING_SIZE_BYTES = 1_500_000; // 1.5MB client limit (server 2MB)
 
 export default function ExamInterface({ exam, resultId, studentId, initialAnswers, initialDrawings, startedAt }: ExamInterfaceProps) {
   const router = useRouter();
+  const { showToast } = useToast();
   
   // PDF States
   const [numPages, setNumPages] = useState<number | null>(null);
@@ -120,10 +122,10 @@ export default function ExamInterface({ exam, resultId, studentId, initialAnswer
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ resultId })
     });
-    alert("Süreniz doldu! Sınavınız otomatik olarak sonlandırıldı.");
+    showToast("Süreniz doldu! Sınavınız otomatik olarak sonlandırıldı.", "info");
     router.push("/ogrenci/dashboard");
     router.refresh();
-  }, [resultId, router]);  // Stable deps — answers/drawings artık ref üzerinden okunuyor
+  }, [resultId, router, showToast]);  // Stable deps — answers/drawings artık ref üzerinden okunuyor
 
   // Dirty Answers Queue for Batching
   const dirtyAnswers = useRef<Record<number, string>>({});

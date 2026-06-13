@@ -231,6 +231,7 @@ model ExamPackage {
   description String?
   isActive    Boolean @default(true)
   isSequential Boolean @default(false)
+  showResultsTime DateTime?
 
   institutionId String?
   institution   Institution? @relation(fields: [institutionId], references: [id])

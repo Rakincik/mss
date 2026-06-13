@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { getDocuments, deleteDocument } from "@/app/actions/documentActions";
-import { FileText, Search, Plus, Trash2, Folder, Tag, AlertCircle } from "lucide-react";
+import { FileText, Search, Plus, Trash2, Folder, Tag, AlertCircle, CheckCircle, X } from "lucide-react";
 import { DocumentType } from "@prisma/client";
 import dayjs from "dayjs";
+import 'dayjs/locale/tr';
+dayjs.locale('tr');
 
 export default function DocumentArchivePage() {
   const [documents, setDocuments] = useState<any[]>([]);
@@ -22,13 +24,22 @@ export default function DocumentArchivePage() {
   const [modalDescription, setModalDescription] = useState("");
   const [modalTags, setModalTags] = useState("");
 
+  const [toast, setToast] = useState<{message: string, type: "success" | "error" | "info" | null}>({message: "", type: null});
+
+  const showToast = (message: string, type: "success" | "error" | "info" = "success") => {
+    setToast({ message, type });
+    setTimeout(() => {
+      setToast(prev => prev.message === message ? { message: "", type: null } : prev);
+    }, 4000);
+  };
+
   const fetchDocuments = async () => {
     setLoading(true);
     try {
       const docs = await getDocuments(activeTab, searchQuery);
       setDocuments(docs);
     } catch (err) {
-      alert("Dokümanlar yüklenemedi.");
+      showToast("Dokümanlar yüklenemedi.", "error");
     } finally {
       setLoading(false);
     }
@@ -43,10 +54,10 @@ export default function DocumentArchivePage() {
     
     try {
       await deleteDocument(id);
-      alert("Doküman silindi.");
+      showToast("Doküman silindi.", "success");
       fetchDocuments();
     } catch (err: any) {
-      alert(err.message || "Silinemedi.");
+      showToast(err.message || "Silinemedi.", "error");
     }
   };
 
@@ -55,7 +66,7 @@ export default function DocumentArchivePage() {
     if (!file) return;
 
     if (file.size > 50 * 1024 * 1024) {
-      alert("Dosya boyutu 50MB sınırını aşamaz.");
+      showToast("Dosya boyutu 50MB sınırını aşamaz.", "error");
       return;
     }
 
@@ -94,10 +105,10 @@ export default function DocumentArchivePage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Yükleme hatası");
       
-      alert("Doküman başarıyla arşive eklendi!");
+      showToast("Doküman başarıyla arşive eklendi!", "success");
       fetchDocuments();
     } catch (err: any) {
-      alert(err.message);
+      showToast(err.message, "error");
     } finally {
       setIsUploading(false);
       setPendingFile(null);
@@ -362,6 +373,25 @@ export default function DocumentArchivePage() {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Toast Notification */}
+      {toast.type && (
+        <div className="fixed bottom-6 right-6 z-[60] animate-in slide-in-from-bottom-8 fade-in duration-300">
+          <div className={`flex items-center gap-3 px-5 py-4 rounded-2xl shadow-xl shadow-slate-900/10 border ${
+            toast.type === "success" ? "bg-emerald-50 border-emerald-200 text-emerald-800" :
+            toast.type === "error" ? "bg-rose-50 border-rose-200 text-rose-800" :
+            "bg-blue-50 border-blue-200 text-blue-800"
+          }`}>
+            {toast.type === "success" && <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center shrink-0"><CheckCircle className="w-5 h-5 text-emerald-600" /></div>}
+            {toast.type === "error" && <div className="w-8 h-8 rounded-full bg-rose-100 flex items-center justify-center shrink-0"><AlertCircle className="w-5 h-5 text-rose-600" /></div>}
+            {toast.type === "info" && <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0"><AlertCircle className="w-5 h-5 text-blue-600" /></div>}
+            <span className="font-bold text-sm tracking-wide">{toast.message}</span>
+            <button onClick={() => setToast({message: "", type: null})} className="ml-4 text-slate-400 hover:text-slate-600 transition-colors p-1.5 rounded-full hover:bg-black/5">
+              <X className="w-4 h-4" />
+            </button>
           </div>
         </div>
       )}
