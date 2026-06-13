@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { BookOpen, LayoutDashboard, ShieldAlert, Users, DollarSign, LogOut, Menu, X, Building2 } from "lucide-react";
+import { BookOpen, LayoutDashboard, ShieldAlert, Users, DollarSign, LogOut, Menu, X, Building2, BarChart3 } from "lucide-react";
 import { ReactNode, useState } from "react";
 import { logoutUser, clearImpersonation } from "@/app/actions/authActions";
 
@@ -45,6 +45,10 @@ export default function AdminShell({ children, user }: AdminShellProps) {
 
           {user.role !== "MUHASEBE" && (
             <>
+              <Link href="/muro-admin/istatistikler" onClick={() => setSidebarOpen(false)} className="flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-slate-600 hover:text-orange-700 hover:bg-orange-50 rounded-xl transition-all group">
+                <BarChart3 className="w-5 h-5 text-slate-400 group-hover:text-orange-500 transition-colors" />
+                <span>İstatistikler</span>
+              </Link>
               <Link href="/muro-admin/sinavlar" onClick={() => setSidebarOpen(false)} className="flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-slate-600 hover:text-purple-700 hover:bg-purple-50 rounded-xl transition-all group">
                 <BookOpen className="w-5 h-5 text-slate-400 group-hover:text-purple-500 transition-colors" />
                 <span>Sınavlar</span>
