@@ -22,10 +22,21 @@ interface StatsDashboardProps {
 export function StatsDashboard({ heroStats, trendData, rankings, leaderboard, exams }: StatsDashboardProps) {
 
   const [searchTerm, setSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState("newest");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  const filteredExams = exams.filter(e => e.title.toLowerCase().includes(searchTerm.toLowerCase()));
+  let filteredExams = exams.filter(e => e.title.toLowerCase().includes(searchTerm.toLowerCase()));
+  
+  // Sıralama mantığı
+  filteredExams = filteredExams.sort((a, b) => {
+    if (sortBy === "newest") return new Date(b.date).getTime() - new Date(a.date).getTime();
+    if (sortBy === "oldest") return new Date(a.date).getTime() - new Date(b.date).getTime();
+    if (sortBy === "highest_participation") return b.participants - a.participants;
+    if (sortBy === "highest_average") return b.average - a.average;
+    return 0;
+  });
+
   const totalPages = Math.ceil(filteredExams.length / itemsPerPage);
   const currentExams = filteredExams.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
@@ -220,19 +231,31 @@ export function StatsDashboard({ heroStats, trendData, rankings, leaderboard, ex
         <div className="lg:col-span-2 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm print:break-inside-avoid">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-4">
             <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-              <FileSpreadsheet className="w-5 h-5 text-emerald-500" /> Kurum Sınav Karneleri
+              <FileSpreadsheet className="w-5 h-5 text-emerald-500" /> Kurum Başarı Tablosu
             </h3>
-            <div className="relative w-full sm:w-64 print:hidden">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-4 w-4 text-gray-400" />
+            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto print:hidden">
+              <select 
+                className="block w-full sm:w-48 pl-3 pr-10 py-2 text-sm border border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 bg-gray-50/50 appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23131313%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:12px_12px] bg-[right_12px_center] bg-no-repeat"
+                value={sortBy}
+                onChange={(e) => { setSortBy(e.target.value); setCurrentPage(1); }}
+              >
+                <option value="newest">En Yeni Eklenenler</option>
+                <option value="oldest">En Eski Eklenenler</option>
+                <option value="highest_participation">Katılımı Yüksek Olanlar</option>
+                <option value="highest_average">Ortalaması Yüksek Olanlar</option>
+              </select>
+              <div className="relative w-full sm:w-56">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Search className="h-4 w-4 text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl text-sm focus:ring-blue-500 focus:border-blue-500 bg-gray-50/50"
+                  placeholder="Sınav ara..."
+                  value={searchTerm}
+                  onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
+                />
               </div>
-              <input
-                type="text"
-                className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl text-sm focus:ring-blue-500 focus:border-blue-500 bg-gray-50/50"
-                placeholder="Sınav ara..."
-                value={searchTerm}
-                onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-              />
             </div>
           </div>
           <div className="overflow-x-auto">
