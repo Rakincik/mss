@@ -9,7 +9,9 @@ export async function getSecurityLogs(page: number = 1, pageSize: number = 25) {
   if (!currentUser) return { logs: [], totalCount: 0, totalPages: 0 };
 
   const whereClause: any = {};
-  whereClause.user = { institutionId: currentUser.institutionId || null };
+  if (currentUser.role !== "SUPERADMIN") {
+    whereClause.user = { institutionId: currentUser.institutionId || null };
+  }
 
   const skip = (page - 1) * pageSize;
   
@@ -33,8 +35,12 @@ export async function getSecurityLogs(page: number = 1, pageSize: number = 25) {
 export async function deleteLog(id: string) {
   const currentUser = await getCurrentUser();
   const whereClause: any = { id };
+  if (currentUser?.role !== "SUPERADMIN") {
+    whereClause.user = { institutionId: currentUser?.institutionId || null };
+  }
+  
   const log = await prisma.securityLog.findFirst({
-    where: { id, user: { institutionId: currentUser?.institutionId || null } }
+    where: whereClause
   });
   if (!log) throw new Error("Bu logu silme yetkiniz yok.");
 
@@ -75,7 +81,9 @@ export async function archiveOldLogs(olderThanDays: number = 90) {
 export async function getLogStats() {
   const currentUser = await getCurrentUser();
   const whereClause: any = {};
-  whereClause.user = { institutionId: currentUser?.institutionId || null };
+  if (currentUser?.role !== "SUPERADMIN") {
+    whereClause.user = { institutionId: currentUser?.institutionId || null };
+  }
 
   const [totalLogs, oldestLog, newestLog] = await Promise.all([
     prisma.securityLog.count({ where: whereClause }),

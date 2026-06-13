@@ -2,6 +2,7 @@ import { Activity, Users, BookOpen, ShieldAlert, Sparkles, TrendingUp, Clock } f
 import { getCurrentUser } from "@/app/actions/authActions";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import { DashboardCharts } from "@/components/admin/DashboardCharts";
 
 export const dynamic = "force-dynamic";
 
@@ -102,6 +103,9 @@ export default async function AdminDashboard() {
           </div>
         ))}
       </div>
+
+      {/* Dinamik Veri Grafikleri */}
+      <DashboardCharts examsData={recentExams.map(e => ({ title: e.title, results: e._count.results }))} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Son Eklenen Sınavlar — GERÇEK VERİLER */}
