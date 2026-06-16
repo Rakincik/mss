@@ -75,12 +75,8 @@ export default async function AdminDashboard() {
 
          <div className="relative flex items-center justify-between flex-wrap gap-4">
              <div className="space-y-1">
-                 <div className="flex items-center gap-2 text-white/60 text-sm">
-                     <Sparkles className="h-4 w-4 text-blue-400" />
-                     Sistem Özeti
-                 </div>
                  <h1 className="text-2xl font-bold">{currentUser?.name || "Sistem"} Dashboard</h1>
-                 <p className="text-white/50 text-sm">{currentUser?.name || "Sistem"} genel durum özeti ve canlı takipler.</p>
+                 <p className="text-white/50 text-sm">{currentUser?.name || "Sistem"} genel durum özeti.</p>
              </div>
          </div>
       </div>

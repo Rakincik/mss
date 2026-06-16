@@ -248,7 +248,7 @@ export default async function StudentDashboardPage() {
         {singleExams.length === 0 ? (
           <div className="py-20 text-center border-2 border-dashed border-slate-200 rounded-3xl bg-white shadow-sm mt-6">
             <BookOpen className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-slate-700">Bekleyen tekil sınav yok!</h3>
+            <h3 className="text-xl font-bold text-slate-700">Bekleyen sınav yok!</h3>
             <p className="text-slate-500 mt-2 max-w-md mx-auto text-sm">Şu an atanmış aktif bir bireysel deneme görünmüyor.</p>
           </div>
         ) : (

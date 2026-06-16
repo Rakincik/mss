@@ -291,7 +291,6 @@ export default function MuhasebeDashboard() {
                        <th className="px-6 py-4">İşlem Özeti</th>
                        <th className="px-6 py-4">Öğrenci Kime Ait</th>
                        <th className="px-6 py-4 text-right">Tutar</th>
-                       <th className="px-6 py-4 text-center">Aksiyon</th>
                      </tr>
                   </thead>
                   <tbody>
@@ -313,23 +312,6 @@ export default function MuhasebeDashboard() {
                               <span className={`font-black text-base ${tx.amount < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
                                 {tx.amount < 0 ? '' : '+'}₺{tx.amount.toLocaleString("tr-TR")}
                               </span>
-                           </td>
-                           <td className="px-6 py-4 text-center">
-                              {tx.amount > 0 && (
-                                <button 
-                                  onClick={() => handleRefund(tx.id)}
-                                  disabled={isRefunding === tx.id}
-                                  className="px-3 py-1.5 bg-white border border-slate-200 hover:border-rose-300 hover:bg-rose-50 text-rose-600 text-xs font-bold rounded-lg inline-flex items-center gap-1.5 shadow-sm transition-colors disabled:opacity-50"
-                                >
-                                  {isRefunding === tx.id ? <Activity className="w-3.5 h-3.5 animate-spin" /> : <Undo2 className="w-3.5 h-3.5" />}
-                                  İade Et
-                                </button>
-                              )}
-                              {tx.amount < 0 && (
-                                <span className="text-[10px] font-bold text-rose-500 uppercase tracking-widest flex items-center justify-center gap-1">
-                                  <AlertCircle className="w-3 h-3" /> İade Edildi
-                                </span>
-                              )}
                            </td>
                         </tr>
                      ))}

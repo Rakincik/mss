@@ -51,8 +51,17 @@ export default function AdminShell({ children, user }: AdminShellProps) {
 
       {/* Sidebar */}
       <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white border-r border-slate-200 flex flex-col shadow-sm transform transition-transform duration-300 ease-in-out print:hidden ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
-        <div className="h-16 flex items-center justify-between px-6 border-b border-slate-100">
-          <div></div>
+        <div className="h-16 flex items-center justify-between px-6 border-b border-slate-100 shrink-0">
+          <div className="flex items-center gap-2">
+            {process.env.NEXT_PUBLIC_LOGO_PATH && process.env.NEXT_PUBLIC_LOGO_PATH !== "/muro-logo.png" ? (
+              <img src={process.env.NEXT_PUBLIC_LOGO_PATH} alt="Logo" className="h-8 w-auto object-contain" />
+            ) : (
+              <LayoutDashboard className="w-6 h-6 text-blue-600" />
+            )}
+            <span className="font-bold text-slate-800 text-lg tracking-tight">
+              {process.env.NEXT_PUBLIC_SITE_NAME?.split(' ')[0] || 'Muro'} <span className="text-blue-600 font-black">Admin</span>
+            </span>
+          </div>
           <button 
             onClick={() => setSidebarOpen(false)}
             className="lg:hidden p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"

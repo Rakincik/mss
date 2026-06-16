@@ -19,12 +19,26 @@ export default async function StudentPanelLayout({ children }: { children: React
         {/* Logo & Brand */}
         <div className="h-24 flex items-center px-8 shrink-0">
           <Link href="/ogrenci/dashboard" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 bg-blue-50 border border-blue-100 rounded-xl flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-sm">
-              <BookOpen className="w-5 h-5" />
-            </div>
+            {process.env.NEXT_PUBLIC_LOGO_PATH && process.env.NEXT_PUBLIC_LOGO_PATH !== "/muro-logo.png" ? (
+              <div className="w-10 h-10 flex items-center justify-center shrink-0">
+                <img 
+                  src={process.env.NEXT_PUBLIC_LOGO_PATH} 
+                  alt="Kurum Logosu" 
+                  className="max-w-full max-h-full object-contain"
+                />
+              </div>
+            ) : (
+              <div className="w-10 h-10 bg-blue-50 border border-blue-100 rounded-xl flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-sm shrink-0">
+                <BookOpen className="w-5 h-5" />
+              </div>
+            )}
             <div>
-              <h1 className="text-xl font-black text-slate-800 tracking-tight leading-none">Muro <span className="text-blue-700">Öğrenci</span></h1>
-              <p className="text-[10px] text-slate-500 font-mono tracking-widest uppercase mt-0.5">Sınav Sistemi</p>
+              <h1 className="text-xl font-black text-slate-800 tracking-tight leading-none">
+                {process.env.NEXT_PUBLIC_SITE_NAME?.split(' ')[0] || 'Muro'} <span className="text-blue-700">Öğrenci</span>
+              </h1>
+              <p className="text-[10px] text-slate-500 font-mono tracking-widest uppercase mt-0.5">
+                {process.env.NEXT_PUBLIC_SITE_NAME?.split(' ').slice(1).join(' ') || 'Sınav Sistemi'}
+              </p>
             </div>
           </Link>
         </div>

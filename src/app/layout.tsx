@@ -12,9 +12,8 @@ const inter = Inter({
 import type { Viewport } from "next";
 
 export const metadata: Metadata = {
-  title: "Muro Sınav Sistemi",
+  title: process.env.NEXT_PUBLIC_SITE_NAME || "Sınav Sistemi",
   description: "Kesintisiz yeni nesil sınav platformu.",
-  manifest: "/manifest.json",
 };
 
 export const viewport: Viewport = {

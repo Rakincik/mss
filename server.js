@@ -15,7 +15,8 @@ app.prepare().then(() => {
   }).listen(port, (err) => {
     if (err) throw err
     const memMB = Math.round(process.memoryUsage().heapTotal / 1024 / 1024)
-    console.log(`> ✅ Muro Sınav Sistemi hazır`)
+    const siteName = process.env.NEXT_PUBLIC_SITE_NAME || 'Muro Sınav Sistemi';
+    console.log(`> ✅ ${siteName} hazır`)
     console.log(`> 🌐 http://localhost:${port}`)
     console.log(`> 📦 Mod: ${dev ? 'DEVELOPMENT' : 'PRODUCTION'}`)
     console.log(`> 💾 Heap: ${memMB}MB | Max: ${Math.round((require('v8').getHeapStatistics().heap_size_limit) / 1024 / 1024)}MB`)
