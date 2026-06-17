@@ -20,6 +20,11 @@ const nextConfig: NextConfig = {
   experimental: {
     serverActions: {
       bodySizeLimit: "30mb",
+      allowedOrigins: [
+        "onlinesinav.4takademi.com",
+        "https://onlinesinav.4takademi.com",
+        "www.onlinesinav.4takademi.com",
+      ],
     },
   },
 
