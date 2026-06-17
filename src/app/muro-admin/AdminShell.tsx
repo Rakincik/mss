@@ -58,9 +58,7 @@ export default function AdminShell({ children, user }: AdminShellProps) {
             ) : (
               <LayoutDashboard className="w-6 h-6 text-blue-600" />
             )}
-            <span className="font-bold text-slate-800 text-lg tracking-tight">
-              {process.env.NEXT_PUBLIC_SITE_NAME?.split(' ')[0] || 'Muro'} <span className="text-blue-600 font-black">Admin</span>
-            </span>
+
           </div>
           <button 
             onClick={() => setSidebarOpen(false)}
