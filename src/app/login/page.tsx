@@ -49,9 +49,6 @@ export default function LoginPage() {
 
         {/* Branding */}
         <div className="text-center mb-6">
-          <h1 className="text-2xl font-black text-slate-800 tracking-tight">
-            {process.env.NEXT_PUBLIC_SITE_NAME?.split(' ')[0] || 'Muro'} <span className="text-blue-600">Sistemi</span>
-          </h1>
           <p className="text-xs text-slate-500 font-medium mt-1">
             {process.env.NEXT_PUBLIC_SITE_NAME || 'Sınav Platformu'}
           </p>
