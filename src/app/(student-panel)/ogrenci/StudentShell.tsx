@@ -52,12 +52,12 @@ export default function StudentShell({ children, student }: StudentShellProps) {
         
         {/* Logo & Brand */}
         <div className="h-20 flex items-center justify-between px-6 shrink-0 border-b border-slate-100">
-          <Link href="/ogrenci/dashboard" className="flex items-center gap-3 group w-full max-w-[200px]">
+          <Link href="/ogrenci/dashboard" className="flex items-center gap-3 group w-full max-w-[240px]">
             {process.env.NEXT_PUBLIC_LOGO_PATH && process.env.NEXT_PUBLIC_LOGO_PATH !== "/muro-logo.png" ? (
               <img 
                 src={process.env.NEXT_PUBLIC_LOGO_PATH} 
                 alt="Kurum Logosu" 
-                className="h-12 w-auto max-w-full object-contain"
+                className="h-16 w-auto max-w-full object-contain"
               />
             ) : (
               <>
@@ -127,9 +127,9 @@ export default function StudentShell({ children, student }: StudentShellProps) {
         
         {/* Mobile Header */}
         <header className="lg:hidden h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 shrink-0 z-10 print:hidden">
-          <div className="flex items-center gap-3 w-full max-w-[200px]">
+          <div className="flex items-center gap-3 w-full max-w-[240px]">
             {process.env.NEXT_PUBLIC_LOGO_PATH && process.env.NEXT_PUBLIC_LOGO_PATH !== "/muro-logo.png" ? (
-               <img src={process.env.NEXT_PUBLIC_LOGO_PATH} alt="Logo" className="h-10 w-auto max-w-full object-contain" />
+               <img src={process.env.NEXT_PUBLIC_LOGO_PATH} alt="Logo" className="h-14 w-auto max-w-full object-contain" />
             ) : (
                <>
                  <BookOpen className="w-6 h-6 text-blue-600" />

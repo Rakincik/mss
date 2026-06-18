@@ -52,9 +52,9 @@ export default function AdminShell({ children, user }: AdminShellProps) {
       {/* Sidebar */}
       <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white border-r border-slate-200 flex flex-col shadow-sm transform transition-transform duration-300 ease-in-out print:hidden ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
         <div className="h-16 flex items-center justify-between px-6 border-b border-slate-100 shrink-0">
-          <div className="flex items-center gap-2 w-full max-w-[180px]">
+          <div className="flex items-center gap-2 w-full max-w-[200px]">
             {process.env.NEXT_PUBLIC_LOGO_PATH && process.env.NEXT_PUBLIC_LOGO_PATH !== "/muro-logo.png" ? (
-              <img src={process.env.NEXT_PUBLIC_LOGO_PATH} alt="Logo" className="h-10 w-auto max-w-full object-contain" />
+              <img src={process.env.NEXT_PUBLIC_LOGO_PATH} alt="Logo" className="h-14 w-auto max-w-full object-contain" />
             ) : (
               <div className="flex items-center gap-2">
                 <LayoutDashboard className="w-6 h-6 text-blue-600" />
