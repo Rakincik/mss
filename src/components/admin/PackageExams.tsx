@@ -14,6 +14,7 @@ export default function PackageExams({ allExams, allGroups = [] }: { allExams: a
   const [calculatingId, setCalculatingId] = useState<string | null>(null);
   const [editPackageId, setEditPackageId] = useState<string | null>(null);
   const [deletePackageId, setDeletePackageId] = useState<string | null>(null);
+  const [confirmCalculateId, setConfirmCalculateId] = useState<string | null>(null);
   const { showToast } = useToast();
 
   const [formData, setFormData] = useState({ title: "", description: "", isSequential: false, showResultsTime: "" });
@@ -63,7 +64,6 @@ export default function PackageExams({ allExams, allGroups = [] }: { allExams: a
   };
 
   const handleCalculate = async (pkgId: string) => {
-    if (!confirm("Bu paketteki tüm öğrencilerin sonuçları toplanıp KPSS/ÖSYM formülleriyle hesaplanacak. Onaylıyor musunuz?")) return;
     setCalculatingId(pkgId);
     const res = await calculatePackageScores(pkgId);
     if (res.success) {
@@ -157,7 +157,7 @@ export default function PackageExams({ allExams, allGroups = [] }: { allExams: a
             <div className="flex items-center justify-between pt-4 border-t border-slate-100">
               <span className="text-xs font-bold text-emerald-600">{pkg.results?.length || 0} Birleşik Karne</span>
               <button 
-                onClick={() => handleCalculate(pkg.id)}
+                onClick={() => setConfirmCalculateId(pkg.id)}
                 disabled={calculatingId === pkg.id}
                 className="flex items-center gap-2 text-xs font-bold px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100 transition-colors disabled:opacity-50"
               >
@@ -309,6 +309,39 @@ export default function PackageExams({ allExams, allGroups = [] }: { allExams: a
                 className="flex-1 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl shadow-md transition-colors"
               >
                 Sil
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Calculate Scores Confirmation Modal */}
+      {confirmCalculateId && (
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl relative animate-in zoom-in-95">
+            <button onClick={() => setConfirmCalculateId(null)} className="absolute top-4 right-4 text-slate-400 hover:bg-slate-100 p-2 rounded-full transition-colors">
+              <X className="w-4 h-4" />
+            </button>
+            <div className="w-12 h-12 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center mb-4 mx-auto">
+              <Calculator className="w-6 h-6" />
+            </div>
+            <h3 className="text-lg font-bold text-center text-slate-800 mb-2">Puanları Hesapla</h3>
+            <p className="text-sm text-center text-slate-500 mb-6">
+              Bu paketteki tüm öğrencilerin sonuçları toplanıp KPSS/ÖSYM formülleriyle hesaplanacak. Onaylıyor musunuz?
+            </p>
+            <div className="flex gap-3">
+              <button onClick={() => setConfirmCalculateId(null)} className="flex-1 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-colors">
+                İptal
+              </button>
+              <button 
+                onClick={async () => {
+                  const pkgId = confirmCalculateId;
+                  setConfirmCalculateId(null);
+                  await handleCalculate(pkgId);
+                }} 
+                className="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md transition-colors"
+              >
+                Hesapla
               </button>
             </div>
           </div>
