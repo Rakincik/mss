@@ -456,15 +456,15 @@ export default function OgrencilerPage() {
                   
                   {/* Kullanıcı */}
                   <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
+                    <Link href={`/muro-admin/ogrenciler/${u.id}`} className="flex items-center gap-3 hover:text-blue-600 transition-colors group/link">
                       <div className="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 font-bold text-xs shrink-0 group-hover:bg-blue-50 group-hover:text-blue-600 group-hover:border-blue-100 transition-colors">
                         {getInitials(u.name || "")}
                       </div>
                       <div className="flex flex-col">
-                        <span className="font-bold text-slate-800">{u.name || "İsimsiz Kullanıcı"}</span>
+                        <span className="font-bold text-slate-800 group-hover/link:text-blue-600 transition-colors">{u.name || "İsimsiz Kullanıcı"}</span>
                         <span className="text-[11px] text-slate-500 font-medium tracking-wide mt-0.5">{u.phone || "Telefon Yok"}</span>
                       </div>
-                    </div>
+                    </Link>
                   </td>
                   
                   {/* Email */}

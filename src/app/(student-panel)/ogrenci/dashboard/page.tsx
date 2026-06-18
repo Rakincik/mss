@@ -26,11 +26,47 @@ export default async function StudentDashboardPage() {
     );
   }
 
-  // Tekil Sınavlar (Pakete bağlı OLMAYANLAR)
+  // Paket Sınavlar (Öğrencinin grubuna tanımlanmış paketler)
+  const packages = await prisma.examPackage.findMany({
+    where: {
+      isActive: true,
+      groups: {
+        some: {
+          id: { in: ((student as any).groups || []).map((g: any) => g.id).concat("NO_GROUP") },
+          isActive: true,
+          OR: [
+            { expireAt: null },
+            { expireAt: { gt: new Date() } }
+          ]
+        }
+      }
+    },
+    include: {
+      exams: {
+        orderBy: { startTime: 'asc' },
+        include: {
+          results: { where: { userId: student.id } }
+        }
+      },
+      results: { where: { userId: student.id } } // PackageResult
+    },
+    orderBy: { createdAt: "desc" }
+  });
+
+  // Tekil Sınavlar (Pakete bağlı olmayanlar VEYA paketi öğrenciye tanımlı olmayanlar)
   const singleExams = await prisma.exam.findMany({
     where: {
       isActive: true,
-      packageId: null, // Sadece tekil sınavlar
+      ...(packages.length > 0 ? {
+        OR: [
+          { packageId: null },
+          {
+            packageId: {
+              notIn: packages.map(p => p.id)
+            }
+          }
+        ]
+      } : {}),
       AND: [
         {
           OR: [
@@ -63,47 +99,6 @@ export default async function StudentDashboardPage() {
     },
     include: {
       results: { where: { userId: student.id } }
-    },
-    orderBy: { createdAt: "desc" }
-  });
-
-  // Paket Sınavlar (İçinde öğrencinin yetkili olduğu en az 1 sınav barındıran paketler)
-  const packages = await prisma.examPackage.findMany({
-    where: {
-      isActive: true,
-      exams: {
-        some: {
-          isActive: true,
-          OR: [
-            {
-              groups: { 
-                some: { 
-                  id: { in: ((student as any).groups || []).map((g: any) => g.id).concat("NO_GROUP") },
-                  isActive: true,
-                  OR: [
-                    { expireAt: null },
-                    { expireAt: { gt: new Date() } }
-                  ]
-                } 
-              }
-            },
-            {
-              directUsers: { 
-                some: { id: student.id } 
-              }
-            }
-          ]
-        }
-      }
-    },
-    include: {
-      exams: {
-        orderBy: { startTime: 'asc' },
-        include: {
-          results: { where: { userId: student.id } }
-        }
-      },
-      results: { where: { userId: student.id } } // PackageResult
     },
     orderBy: { createdAt: "desc" }
   });
