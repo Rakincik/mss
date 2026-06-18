@@ -13,6 +13,7 @@ export default function SinavlarPage() {
   const { showToast } = useToast();
   const [activeTab, setActiveTab] = useState<'exams' | 'packages'>('exams');
   const [exams, setExams] = useState<any[]>([]);
+  const [allExams, setAllExams] = useState<any[]>([]);
   const [groups, setGroups] = useState<any[]>([]);
   const [examDocuments, setExamDocuments] = useState<any[]>([]);
   const [solutionDocuments, setSolutionDocuments] = useState<any[]>([]);
@@ -92,12 +93,14 @@ export default function SinavlarPage() {
     const p = page ?? currentPage;
     const s = sort ?? sortBy;
     const q = search ?? searchQuery;
-    const [examResult, fetchedGroups, fetchedDocs] = await Promise.all([
+    const [examResult, fetchedGroups, fetchedDocs, allExamsResult] = await Promise.all([
       getExams({ page: p, pageSize: 12, sortBy: s, search: q }),
       getGroups(),
-      getDocuments()
+      getDocuments(),
+      getExams({ page: 1, pageSize: 1000, sortBy: 'newest' })
     ]);
     setExams(examResult.exams);
+    setAllExams(allExamsResult.exams);
     setTotalPages(examResult.totalPages);
     setTotalCount(examResult.totalCount);
     setGroups(fetchedGroups);
@@ -298,7 +301,7 @@ export default function SinavlarPage() {
       </div>
 
       {activeTab === "packages" ? (
-        <PackageExams allExams={exams} allGroups={groups} />
+        <PackageExams allExams={allExams} allGroups={groups} />
       ) : (
         <>
         {/* Arama + Sıralama Toolbar */}
