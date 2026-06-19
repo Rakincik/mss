@@ -2,7 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath, revalidateTag } from "next/cache";
-import { writeFile } from "fs/promises";
+import { saveUploadedFile } from "@/lib/fileUpload";
 import path from "path";
 import { getCurrentUser } from "./authActions";
 
@@ -85,16 +85,17 @@ export async function createExam(formData: FormData) {
 
   // Sınav PDF'ini Kaydet
   const pdfBytes = await pdfFile.arrayBuffer();
-  const pdfName = `${Date.now()}-sinav-${pdfFile.name.replace(/\s+/g, '-')}`;
-  await writeFile(path.join(process.cwd(), "public/uploads", pdfName), Buffer.from(pdfBytes));
+  const safeName = pdfFile.name.replace(/[^a-zA-Z0-9.\-_]/g, '-');
+  const pdfName = `${Date.now()}-sinav-${safeName}`;
+  await saveUploadedFile(pdfName, Buffer.from(pdfBytes));
   const pdfUrl = `/uploads/${pdfName}`;
 
   // Varsa Çözüm Kitapçığını Kaydet
   let solutionPdfUrl = null;
   if (solutionPdfFile && solutionPdfFile.size > 0) {
     const solBytes = await solutionPdfFile.arrayBuffer();
-    const solName = `${Date.now()}-cozum-${solutionPdfFile.name.replace(/\s+/g, '-')}`;
-    await writeFile(path.join(process.cwd(), "public/uploads", solName), Buffer.from(solBytes));
+    const solName = `${Date.now()}-cozum-${solutionPdfFile.name.replace(/[^a-zA-Z0-9.\-_]/g, '-')}`;
+    await saveUploadedFile(solName, Buffer.from(solBytes));
     solutionPdfUrl = `/uploads/${solName}`;
   }
 
@@ -270,16 +271,17 @@ export async function updateExamFull(id: string, formData: FormData) {
   // Yeni PDF yüklendiyse
   if (pdfFile && pdfFile.size > 0) {
     const pdfBytes = await pdfFile.arrayBuffer();
-    const pdfName = `${Date.now()}-sinav-${pdfFile.name.replace(/\s+/g, '-')}`;
-    await writeFile(path.join(process.cwd(), "public/uploads", pdfName), Buffer.from(pdfBytes));
+    const safeName = pdfFile.name.replace(/[^a-zA-Z0-9.\-_]/g, '-');
+    const pdfName = `${Date.now()}-sinav-${safeName}`;
+    await saveUploadedFile(pdfName, Buffer.from(pdfBytes));
     finalPdfUrl = `/uploads/${pdfName}`;
   }
 
   // Yeni Çözüm PDF'i yüklendiyse
   if (solutionPdfFile && solutionPdfFile.size > 0) {
     const solBytes = await solutionPdfFile.arrayBuffer();
-    const solName = `${Date.now()}-cozum-${solutionPdfFile.name.replace(/\s+/g, '-')}`;
-    await writeFile(path.join(process.cwd(), "public/uploads", solName), Buffer.from(solBytes));
+    const solName = `${Date.now()}-cozum-${solutionPdfFile.name.replace(/[^a-zA-Z0-9.\-_]/g, '-')}`;
+    await saveUploadedFile(solName, Buffer.from(solBytes));
     finalSolutionPdfUrl = `/uploads/${solName}`;
   }
 

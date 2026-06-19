@@ -32,10 +32,30 @@ export function middleware(request: NextRequest) {
     return response;
   }
 
+  // /muro-admin koruması
+  if (pathname.startsWith("/muro-admin")) {
+    const sessionCookie = request.cookies.get("muro_session")?.value;
+    if (!sessionCookie) {
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
+  }
+
+  // /ogrenci koruması
+  if (pathname.startsWith("/ogrenci")) {
+    const sessionCookie = request.cookies.get("muro_session")?.value || request.cookies.get("muro_student_id")?.value;
+    if (!sessionCookie) {
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
+  }
+
   return NextResponse.next();
 }
 
 // Middleware sadece bu yollarda çalışsın (performans için)
 export const config = {
-  matcher: ["/uploads/:path*"],
+  matcher: [
+    "/uploads/:path*",
+    "/muro-admin/:path*",
+    "/ogrenci/:path*"
+  ],
 };

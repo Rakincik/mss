@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { writeFile } from "fs/promises";
+import { saveUploadedFile } from "@/lib/fileUpload";
 import path from "path";
 import { prisma } from "@/lib/prisma";
 
@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
       const pdfBytes = await pdfFile.arrayBuffer();
       const safeName = pdfFile.name.replace(/[^a-zA-Z0-9.\-_]/g, '-');
       const pdfName = `${Date.now()}-sinav-${safeName}`;
-      await writeFile(path.join(process.cwd(), "public/uploads", pdfName), Buffer.from(pdfBytes));
+      await saveUploadedFile(pdfName, Buffer.from(pdfBytes));
       pdfUrl = `/uploads/${pdfName}`;
       
       // Arşive otomatik ekle
@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
       const solBytes = await solutionPdfFile.arrayBuffer();
       const safeSolName = solutionPdfFile.name.replace(/[^a-zA-Z0-9.\-_]/g, '-');
       const solName = `${Date.now()}-cozum-${safeSolName}`;
-      await writeFile(path.join(process.cwd(), "public/uploads", solName), Buffer.from(solBytes));
+      await saveUploadedFile(solName, Buffer.from(solBytes));
       solutionPdfUrl = `/uploads/${solName}`;
       
       // Arşive otomatik ekle

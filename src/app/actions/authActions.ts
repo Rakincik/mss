@@ -135,7 +135,7 @@ export async function logoutUser() {
   cookieStore.delete("muro_session");
   cookieStore.delete("muro_student_id");
   cookieStore.delete("muro_impersonate_tenant");
-  redirect("/login");
+  // client tarafında hard reload atılacak
 }
 
 export async function impersonateTenant(institutionId: string) {

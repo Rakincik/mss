@@ -110,15 +110,17 @@ export default function StudentShell({ children, student }: StudentShellProps) {
         </nav>
 
         {/* Logout */}
-        <div className="p-6 border-t border-slate-100 shrink-0">
-          <form action={logoutUser} className="w-full">
-            <button type="submit" className="w-full flex items-center justify-between px-4 py-3 text-sm font-bold text-red-500 bg-red-50 hover:bg-red-100 hover:text-red-700 rounded-xl transition-all group">
-              <span className="flex items-center gap-3">
-                <LogOut className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-                Güvenli Çıkış
-              </span>
-            </button>
-          </form>
+        <div className="absolute bottom-0 w-full p-4 border-t border-slate-100 bg-white group">
+          <button 
+            type="button" 
+            onClick={async () => { await logoutUser(); window.location.href = "/login"; }} 
+            className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-2xl transition-all"
+          >
+            <div className="w-10 h-10 rounded-xl bg-rose-50 group-hover:bg-rose-100 flex items-center justify-center transition-colors">
+              <LogOut className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+            </div>
+            <span>Güvenli Çıkış</span>
+          </button>
         </div>
       </aside>
 

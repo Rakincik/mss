@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { writeFile } from "fs/promises";
+import { saveUploadedFile } from "@/lib/fileUpload";
 import path from "path";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
     const bytes = await file.arrayBuffer();
     const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '-');
     const fileName = `${Date.now()}-arsiv-${safeName}`;
-    await writeFile(path.join(process.cwd(), "public/uploads", fileName), Buffer.from(bytes));
+    await saveUploadedFile(fileName, Buffer.from(bytes));
     
     const url = `/uploads/${fileName}`;
 

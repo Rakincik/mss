@@ -103,12 +103,14 @@ export default function AdminShell({ children, user }: AdminShellProps) {
         </nav>
 
         <div className="p-4 border-t border-slate-100 bg-slate-50/50">
-          <form action={logoutUser}>
-            <button type="submit" className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-bold text-rose-600 hover:text-rose-700 bg-rose-50 border border-rose-200 hover:border-rose-300 rounded-xl transition-all shadow-sm hover:shadow">
-              <LogOut className="w-4 h-4" />
-              <span>Güvenli Çıkış Yap</span>
-            </button>
-          </form>
+          <button 
+            type="button" 
+            onClick={async () => { await logoutUser(); window.location.href = "/login"; }} 
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-bold text-rose-600 hover:text-rose-700 bg-rose-50 border border-rose-200 hover:border-rose-300 rounded-xl transition-all shadow-sm hover:shadow"
+          >
+            <LogOut className="w-4 h-4" />
+            <span>Güvenli Çıkış Yap</span>
+          </button>
         </div>
       </aside>
 
@@ -156,11 +158,14 @@ export default function AdminShell({ children, user }: AdminShellProps) {
               </div>
             </div>
             
-            <form action={logoutUser} className="hidden md:block">
-              <button type="submit" className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors" title="Çıkış Yap">
-                <LogOut className="w-5 h-5" />
-              </button>
-            </form>
+            <button 
+              type="button" 
+              onClick={async () => { await logoutUser(); window.location.href = "/login"; }} 
+              className="hidden md:block p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors" 
+              title="Çıkış Yap"
+            >
+              <LogOut className="w-5 h-5" />
+            </button>
           </div>
         </header>
         <div className="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">

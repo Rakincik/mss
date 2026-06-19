@@ -19,7 +19,7 @@ export default function LoginPage() {
     const res = await loginWithCredentials(formData);
     
     if (res.success && res.redirectUrl) {
-      router.push(res.redirectUrl);
+      window.location.href = res.redirectUrl;
     } else {
       setError(res.message || "Giriş başarısız.");
       setLoading(false);
