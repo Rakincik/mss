@@ -32,6 +32,17 @@ const nextConfig: NextConfig = {
   images: {
     formats: ["image/avif", "image/webp"],
   },
+
+  async rewrites() {
+    return {
+      fallback: [
+        {
+          source: "/uploads/:path*",
+          destination: "/api/uploads/:path*",
+        },
+      ],
+    };
+  },
 };
 
 export default withSerwist(nextConfig);
