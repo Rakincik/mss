@@ -150,15 +150,20 @@ export async function calculatePackageScores(packageId: string) {
       const totalScore = standart_net + gy_gk_net + eb_net + oabt_net + alan_net;
 
       // Hangi puanların anlamlı olduğunu belirle
+      const hasGyGk = pkg.exams.some(e => e.sessionType === 'GY_GK');
+      const hasEb = pkg.exams.some(e => e.sessionType === 'EB');
+      const hasOabt = pkg.exams.some(e => e.sessionType === 'OABT');
+      const hasAlan = pkg.exams.some(e => e.sessionType === 'ALAN');
+
       const finalScores: Record<string, number> = { total: totalScore };
-      if (gy_gk_net > 0) {
+      if (hasGyGk || gy_gk_net !== 0) {
         finalScores["KPSS_P3"] = Number(KPSS_P3.toFixed(3));
         finalScores["KPSS_P93"] = Number(KPSS_P3.toFixed(3));
         finalScores["KPSS_P94"] = Number(KPSS_P3.toFixed(3));
       }
-      if (eb_net > 0) finalScores["KPSS_P10"] = Number(KPSS_P10.toFixed(3));
-      if (oabt_net > 0) finalScores["KPSS_P121"] = Number(KPSS_P121.toFixed(3));
-      if (alan_net > 0) finalScores["KPSS_P48"] = Number(ALAN_PUANI.toFixed(3));
+      if (hasEb || eb_net !== 0) finalScores["KPSS_P10"] = Number(KPSS_P10.toFixed(3));
+      if (hasOabt || oabt_net !== 0) finalScores["KPSS_P121"] = Number(KPSS_P121.toFixed(3));
+      if (hasAlan || alan_net !== 0) finalScores["KPSS_P48"] = Number(ALAN_PUANI.toFixed(3));
       
       // Update or create PackageResult
       await prisma.packageResult.upsert({
