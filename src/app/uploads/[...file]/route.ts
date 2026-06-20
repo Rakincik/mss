@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { readFileSync, existsSync } from "fs";
 import path from "path";
 
-export async function GET(req: NextRequest, { params }: { params: { file: string[] } }) {
+export async function GET(req: NextRequest, { params }: { params: any }) {
   try {
-    const filename = params.file.join("/");
+    const resolvedParams = await params;
+    const filename = resolvedParams.file.join("/");
     
     // Güvenlik: Dizin atlamayı engelle
     if (filename.includes("..") || filename.includes("\0")) {
