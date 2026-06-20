@@ -36,27 +36,43 @@ export default async function PaketKarnesiPage({ params }: { params: Promise<{ p
 
   const scoresObj = (packageResult.scores as Record<string, number>) || {};
   
-  // Sıralama Algoritması
-  let primaryScoreKey = "total";
-  let primaryScoreName = "Genel Toplam";
-  if (scoresObj.KPSS_P121) { primaryScoreKey = "KPSS_P121"; primaryScoreName = "KPSS P121"; }
-  else if (scoresObj.KPSS_P10) { primaryScoreKey = "KPSS_P10"; primaryScoreName = "KPSS P10"; }
-  else if (scoresObj.KPSS_P3) { primaryScoreKey = "KPSS_P3"; primaryScoreName = "KPSS P3"; }
-  else if (scoresObj.KPSS_P93) { primaryScoreKey = "KPSS_P93"; primaryScoreName = "KPSS P93"; }
-  else if (scoresObj.KPSS_P94) { primaryScoreKey = "KPSS_P94"; primaryScoreName = "KPSS P94"; }
-  else if (scoresObj.KPSS_P48) { primaryScoreKey = "KPSS_P48"; primaryScoreName = "KPSS P48"; }
-
   const allResults = await prisma.packageResult.findMany({
     where: { packageId, isComputed: true }
   });
 
-  const scoredResults = allResults.map(r => {
-     const s = (r.scores as Record<string, number>) || {};
-     return { userId: r.userId, val: s[primaryScoreKey] || 0 };
-  }).sort((a, b) => b.val - a.val);
+  const totalRealParticipants = allResults.length;
 
-  const realRank = scoredResults.findIndex(r => r.userId === student.id) + 1;
-  const totalRealParticipants = scoredResults.length;
+  const validScoreKeys = Object.keys(scoresObj).filter(k => k !== 'total');
+  const keysToRank = validScoreKeys.length > 0 ? validScoreKeys : ["total"];
+
+  const rankData = keysToRank.map(key => {
+    let name = key;
+    if (key === "KPSS_P3") name = "KPSS P3";
+    if (key === "KPSS_P93") name = "KPSS P93";
+    if (key === "KPSS_P94") name = "KPSS P94";
+    if (key === "KPSS_P10") name = "KPSS P10";
+    if (key === "KPSS_P121") name = "KPSS P121";
+    if (key === "KPSS_P48") name = "KPSS P48";
+    if (key === "KAYMAKAMLIK") name = "Kaymakamlık";
+    if (key === "HMGS") name = "HMGS";
+    if (key === "ICRA") name = "İcra Müd. Yrd.";
+    if (key === "total") name = "Genel Toplam";
+
+    const scoredList = allResults.map(r => {
+      const s = (r.scores as Record<string, number>) || {};
+      return { userId: r.userId, val: s[key] || 0 };
+    }).sort((a, b) => b.val - a.val);
+
+    const realRank = scoredList.findIndex(r => r.userId === student.id) + 1;
+    
+    return {
+       key,
+       name,
+       score: scoresObj[key] || 0,
+       rank: realRank,
+       total: totalRealParticipants
+    };
+  });
 
   return (
     <div className="font-sans text-slate-800 pb-20">
@@ -77,43 +93,33 @@ export default async function PaketKarnesiPage({ params }: { params: Promise<{ p
           </div>
         </div>
 
-        {/* Ana Puanlar ve Sıralama */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="md:col-span-2 grid grid-cols-2 gap-4">
-            {Object.entries(scoresObj).map(([key, value]) => {
-              if (key === "total") return null;
-              
-              let label = key;
-              if (key === "KPSS_P3") label = "KPSS P3";
-              if (key === "KPSS_P93") label = "KPSS P93";
-              if (key === "KPSS_P94") label = "KPSS P94";
-              if (key === "KPSS_P10") label = "KPSS P10";
-              if (key === "KPSS_P121") label = "KPSS P121";
-              if (key === "KPSS_P48") label = "KPSS P48";
-
-              return (
-                <div key={key} className="bg-white border border-indigo-200 rounded-2xl p-6 relative overflow-hidden shadow-[0_0_20px_rgba(99,102,241,0.15)]">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50/50 rounded-full -mr-16 -mt-16"></div>
-                  <p className="text-indigo-600 text-[10px] font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                    <Calculator className="w-3 h-3" /> {label}
+        {/* Ana Puanlar ve Sıralamalar */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {rankData.map((data) => (
+             <div key={data.key} className="flex flex-col gap-4">
+                {/* Puan Kutusu */}
+                <div className="bg-white border border-indigo-200 rounded-2xl p-6 relative overflow-hidden shadow-[0_0_20px_rgba(99,102,241,0.15)] flex flex-col justify-between h-full min-h-[140px]">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50/50 rounded-full -mr-16 -mt-16 pointer-events-none"></div>
+                  <p className="text-indigo-600 text-[10px] font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5 relative z-10">
+                    <Calculator className="w-3 h-3" /> {data.name}
                   </p>
-                  <div className="flex items-end gap-2 relative z-10">
-                    <span className="text-4xl font-black text-slate-800">{value}</span>
+                  <div className="flex items-end gap-2 relative z-10 mt-auto">
+                    <span className="text-4xl font-black text-slate-800">{data.score}</span>
                   </div>
                 </div>
-              );
-            })}
-          </div>
 
-          <div className="bg-white border border-amber-200 rounded-2xl p-6 relative overflow-hidden shadow-[0_0_20px_rgba(245,158,11,0.15)] flex flex-col justify-center items-center text-center">
-             <div className="absolute top-0 left-0 w-32 h-32 bg-amber-50/50 rounded-full -ml-16 -mt-16"></div>
-             <Trophy className="w-12 h-12 text-amber-500 mb-3 relative z-10" />
-             <p className="text-amber-600 text-[10px] font-bold uppercase tracking-wider mb-1 relative z-10">{primaryScoreName} Sıralamanız</p>
-             <div className="flex items-end gap-2 relative z-10">
-               <span className="text-4xl font-black text-slate-800">{realRank}</span>
-               <span className="text-lg font-bold text-slate-400 mb-1">/ {totalRealParticipants}</span>
+                {/* Sıralama Kutusu */}
+                <div className="bg-white border border-amber-200 rounded-2xl p-6 relative overflow-hidden shadow-[0_0_20px_rgba(245,158,11,0.15)] flex flex-col justify-center items-center text-center min-h-[160px]">
+                   <div className="absolute top-0 left-0 w-32 h-32 bg-amber-50/50 rounded-full -ml-16 -mt-16 pointer-events-none"></div>
+                   <Trophy className="w-10 h-10 text-amber-500 mb-3 relative z-10" />
+                   <p className="text-amber-600 text-[10px] font-bold uppercase tracking-wider mb-2 relative z-10">{data.name} Sıralamanız</p>
+                   <div className="flex items-end gap-2 relative z-10">
+                     <span className="text-4xl font-black text-slate-800">{data.rank}</span>
+                     <span className="text-lg font-bold text-slate-400 mb-1">/ {data.total}</span>
+                   </div>
+                </div>
              </div>
-          </div>
+          ))}
         </div>
 
         {/* Alt Oturumlar (Sınavlar) Özeti */}
