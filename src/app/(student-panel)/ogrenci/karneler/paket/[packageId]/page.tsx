@@ -41,8 +41,10 @@ export default async function PaketKarnesiPage({ params }: { params: Promise<{ p
   let primaryScoreName = "Genel Toplam";
   if (scoresObj.KPSS_P121) { primaryScoreKey = "KPSS_P121"; primaryScoreName = "KPSS P121"; }
   else if (scoresObj.KPSS_P10) { primaryScoreKey = "KPSS_P10"; primaryScoreName = "KPSS P10"; }
-  else if (scoresObj.KPSS_P3_P93) { primaryScoreKey = "KPSS_P3_P93"; primaryScoreName = "KPSS P3 / P93"; }
-  else if (scoresObj.ALAN_PUANI) { primaryScoreKey = "ALAN_PUANI"; primaryScoreName = "Alan Sınavı"; }
+  else if (scoresObj.KPSS_P3) { primaryScoreKey = "KPSS_P3"; primaryScoreName = "KPSS P3"; }
+  else if (scoresObj.KPSS_P93) { primaryScoreKey = "KPSS_P93"; primaryScoreName = "KPSS P93"; }
+  else if (scoresObj.KPSS_P94) { primaryScoreKey = "KPSS_P94"; primaryScoreName = "KPSS P94"; }
+  else if (scoresObj.KPSS_P48) { primaryScoreKey = "KPSS_P48"; primaryScoreName = "KPSS P48"; }
 
   const allResults = await prisma.packageResult.findMany({
     where: { packageId, isComputed: true }
@@ -82,10 +84,12 @@ export default async function PaketKarnesiPage({ params }: { params: Promise<{ p
               if (key === "total") return null;
               
               let label = key;
-              if (key === "KPSS_P3_P93") label = "KPSS P3 / P93";
+              if (key === "KPSS_P3") label = "KPSS P3";
+              if (key === "KPSS_P93") label = "KPSS P93";
+              if (key === "KPSS_P94") label = "KPSS P94";
               if (key === "KPSS_P10") label = "KPSS P10";
               if (key === "KPSS_P121") label = "KPSS P121";
-              if (key === "ALAN_PUANI") label = "Alan Puanı";
+              if (key === "KPSS_P48") label = "KPSS P48";
 
               return (
                 <div key={key} className="bg-white border border-indigo-200 rounded-2xl p-6 relative overflow-hidden shadow-[0_0_20px_rgba(99,102,241,0.15)]">

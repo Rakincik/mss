@@ -44,9 +44,11 @@ export default async function PaketRaporPage({ params }: { params: Promise<{ pac
   });
 
   // Sıralama İçin En Popüler Puan Türünü Bul
-  let primaryScoreKey = "KPSS_P3_P93";
+  let primaryScoreKey = "KPSS_P3";
   if (averages["KPSS_P121"]) primaryScoreKey = "KPSS_P121";
   else if (averages["KPSS_P10"]) primaryScoreKey = "KPSS_P10";
+  else if (averages["KPSS_P93"]) primaryScoreKey = "KPSS_P93";
+  else if (averages["KPSS_P48"]) primaryScoreKey = "KPSS_P48";
 
   // Öğrencileri Sırala
   const sortedStudents = [...pkg.results].sort((a, b) => {
