@@ -223,7 +223,7 @@ export default async function SınavKarnesiPage({ params }: { params: Promise<{ 
              <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50/50 rounded-full -mr-16 -mt-16"></div>
              <p className="text-indigo-600 text-[10px] font-bold uppercase tracking-wider mb-2">Sınav Puanı</p>
              <div className="flex items-end gap-2 relative z-10">
-               <span className="text-4xl md:text-5xl font-black text-slate-800">{result.score}</span>
+               <span className="text-4xl md:text-5xl font-black text-slate-800">{typeof result.score === 'number' ? parseFloat(result.score.toFixed(3)) : result.score}</span>
                <span className="text-sm font-bold text-slate-400 mb-1.5">/ {ceilingScore}</span>
              </div>
           </div>
