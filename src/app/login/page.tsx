@@ -34,7 +34,7 @@ export default function LoginPage() {
         
         {/* İkon / Logo */}
         {process.env.NEXT_PUBLIC_LOGO_PATH && process.env.NEXT_PUBLIC_LOGO_PATH !== "/muro-logo.png" ? (
-          <div className="mx-auto w-24 h-24 mb-4 flex items-center justify-center">
+          <div className="mx-auto w-full max-w-[280px] h-28 mb-8 flex items-center justify-center">
             <img 
               src={process.env.NEXT_PUBLIC_LOGO_PATH} 
               alt="Kurum Logosu" 
@@ -42,17 +42,17 @@ export default function LoginPage() {
             />
           </div>
         ) : (
-          <div className="mx-auto w-20 h-20 bg-gradient-to-br from-[#1d8cd4] to-[#126ab0] rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30 mb-4">
-            <GraduationCap className="w-10 h-10 text-white" />
-          </div>
-        )}
-
-        {/* Branding */}
-        <div className="text-center mb-6">
-          <p className="text-xs text-slate-500 font-medium mt-1">
-            {process.env.NEXT_PUBLIC_SITE_NAME || 'Sınav Platformu'}
-          </p>
-        </div>        {error && (
+          <>
+            <div className="mx-auto w-20 h-20 bg-gradient-to-br from-[#1d8cd4] to-[#126ab0] rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30 mb-4">
+              <GraduationCap className="w-10 h-10 text-white" />
+            </div>
+            <div className="text-center mb-6">
+              <p className="text-xs text-slate-500 font-medium mt-1">
+                {process.env.NEXT_PUBLIC_SITE_NAME || 'Sınav Platformu'}
+              </p>
+            </div>
+          </>
+        )}        {error && (
           <div className="bg-red-50 text-red-600 text-sm font-semibold p-3.5 rounded-xl mb-6 shadow-sm border border-red-100">
             {error}
           </div>
