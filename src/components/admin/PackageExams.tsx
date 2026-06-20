@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Trash2, Calculator, Layers, BookOpen, Edit2, AlertTriangle, X, BarChart, Search } from "lucide-react";
+import { Plus, Trash2, Calculator, Layers, BookOpen, Edit2, AlertTriangle, X, BarChart, Search, ArrowUpDown } from "lucide-react";
 import { getPackages, createPackage, deletePackage, calculatePackageScores, updatePackage } from "@/app/actions/packageActions";
 import Link from "next/link";
 import { useToast } from "@/hooks/useToast";
@@ -22,6 +22,10 @@ export default function PackageExams({ allExams, allGroups = [] }: { allExams: a
   const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
   const [examSearchTerm, setExamSearchTerm] = useState("");
   const [groupSearchTerm, setGroupSearchTerm] = useState("");
+
+  const [sortBy, setSortBy] = useState('newest');
+  const [searchInput, setSearchInput] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const fetchPackages = async () => {
     setLoading(true);
@@ -77,6 +81,22 @@ export default function PackageExams({ allExams, allGroups = [] }: { allExams: a
 
   if (loading) return <div className="text-center py-10 text-slate-500">Paketler yükleniyor...</div>;
 
+  let filteredPackages = [...packages];
+  
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    filteredPackages = filteredPackages.filter(p => p.title.toLowerCase().includes(q) || (p.description && p.description.toLowerCase().includes(q)));
+  }
+
+  filteredPackages.sort((a, b) => {
+    if (sortBy === 'newest') return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+    if (sortBy === 'oldest') return new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime();
+    if (sortBy === 'updated') return new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime();
+    if (sortBy === 'az') return a.title.localeCompare(b.title);
+    if (sortBy === 'za') return b.title.localeCompare(a.title);
+    return 0;
+  });
+
   return (
     <div className="space-y-6 animate-in fade-in">
       <div className="flex justify-between items-center mb-6">
@@ -100,8 +120,45 @@ export default function PackageExams({ allExams, allGroups = [] }: { allExams: a
         </button>
       </div>
 
+      <div className="flex flex-col sm:flex-row gap-3 mb-6">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <input
+            type="text"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                setSearchQuery(searchInput);
+              }
+            }}
+            placeholder="Paket ara..."
+            className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-700 outline-none focus:border-blue-500 shadow-sm transition-colors placeholder:text-slate-400"
+          />
+        </div>
+        <div className="flex gap-2">
+          <div className="relative">
+            <ArrowUpDown className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="pl-10 pr-8 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 outline-none focus:border-blue-500 shadow-sm transition-colors appearance-none cursor-pointer"
+            >
+              <option value="newest">Son Eklenen</option>
+              <option value="oldest">İlk Eklenen</option>
+              <option value="updated">Son Düzenlenen</option>
+              <option value="az">A → Z</option>
+              <option value="za">Z → A</option>
+            </select>
+          </div>
+          <span className="flex items-center px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-500">
+            {filteredPackages.length} paket
+          </span>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {packages.map(pkg => (
+        {filteredPackages.map(pkg => (
           <div key={pkg.id} className="bg-white border border-slate-200 rounded-2xl p-6 hover:shadow-md transition-shadow">
             <div className="flex justify-between items-start mb-4">
               <div className="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
@@ -166,10 +223,12 @@ export default function PackageExams({ allExams, allGroups = [] }: { allExams: a
             </div>
           </div>
         ))}
-        {packages.length === 0 && (
+        {filteredPackages.length === 0 && (
            <div className="col-span-full py-16 text-center border-2 border-dashed border-slate-200 bg-white rounded-3xl">
              <Layers className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-             <p className="text-slate-500 font-medium mb-3">Henüz paket sınav oluşturulmamış.</p>
+             <p className="text-slate-500 font-medium mb-3">
+               {searchQuery ? 'Arama sonucu bulunamadı.' : 'Henüz paket sınav oluşturulmamış.'}
+             </p>
            </div>
         )}
       </div>
