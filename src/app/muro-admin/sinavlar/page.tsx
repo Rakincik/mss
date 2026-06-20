@@ -8,6 +8,7 @@ import { getGroups } from "@/app/actions/userActions";
 import { getDocuments } from "@/app/actions/documentActions";
 import PackageExams from "@/components/admin/PackageExams";
 import { useToast } from "@/hooks/useToast";
+import SearchableSelect from "@/components/ui/SearchableSelect";
 
 export default function SinavlarPage() {
   const { showToast } = useToast();
@@ -566,12 +567,12 @@ export default function SinavlarPage() {
                     <div className="space-y-5">
                       <div className="bg-white p-4 border border-slate-200 rounded-xl shadow-sm">
                         <label className="block text-[11px] uppercase tracking-widest font-bold text-slate-500 mb-3">Ana Sınav PDF'i *</label>
-                        <select name="existingPdfUrl" className="w-full text-sm text-slate-700 bg-slate-50 border border-slate-200 px-3 py-2.5 rounded-lg mb-3 outline-none focus:border-emerald-500" defaultValue="">
-                           <option value="">-- Bilgisayardan Yeni Yükleyeceğim --</option>
-                           {examDocuments.map(doc => (
-                             <option key={doc.id} value={doc.url}>{doc.name} {doc.tags ? `(${doc.tags})` : ''}</option>
-                           ))}
-                        </select>
+                        <SearchableSelect
+                           name="existingPdfUrl"
+                           placeholder="-- Bilgisayardan Yeni Yükleyeceğim --"
+                           defaultValue=""
+                           options={examDocuments.map(doc => ({ value: doc.url, label: `${doc.name} ${doc.tags ? `(${doc.tags})` : ''}` }))}
+                        />
                         <div className="flex items-center gap-3">
                           <span className="text-[10px] font-bold text-slate-400">VEYA YENİ YÜKLE:</span>
                           <input name="pdfFile" type="file" accept=".pdf" className="w-full text-sm text-slate-600 file:bg-emerald-50 file:text-emerald-700 file:font-bold file:border-0 file:px-4 file:py-2 file:rounded-lg hover:file:bg-emerald-100 transition-colors cursor-pointer" />
@@ -580,12 +581,12 @@ export default function SinavlarPage() {
 
                       <div className="bg-white p-4 border border-slate-200 rounded-xl shadow-sm">
                         <label className="block text-[11px] uppercase tracking-widest font-bold text-slate-500 mb-3">Çözüm Kitapçığı PDF'i (Opsiyonel)</label>
-                        <select name="existingSolutionPdfUrl" className="w-full text-sm text-slate-700 bg-slate-50 border border-slate-200 px-3 py-2.5 rounded-lg mb-3 outline-none focus:border-emerald-500" defaultValue="">
-                           <option value="">-- Bilgisayardan Yeni Yükleyeceğim --</option>
-                           {solutionDocuments.map(doc => (
-                             <option key={doc.id} value={doc.url}>{doc.name} {doc.tags ? `(${doc.tags})` : ''}</option>
-                           ))}
-                        </select>
+                        <SearchableSelect
+                           name="existingSolutionPdfUrl"
+                           placeholder="-- Bilgisayardan Yeni Yükleyeceğim --"
+                           defaultValue=""
+                           options={solutionDocuments.map(doc => ({ value: doc.url, label: `${doc.name} ${doc.tags ? `(${doc.tags})` : ''}` }))}
+                        />
                         <div className="flex items-center gap-3">
                           <span className="text-[10px] font-bold text-slate-400">VEYA YENİ YÜKLE:</span>
                           <input name="solutionPdfFile" type="file" accept=".pdf" className="w-full text-sm text-slate-600 file:bg-slate-100 file:text-slate-700 file:font-bold file:border-0 file:px-4 file:py-2 file:rounded-lg hover:file:bg-slate-200 transition-colors cursor-pointer" />
@@ -1014,12 +1015,12 @@ export default function SinavlarPage() {
                             <BookOpen className="w-3 h-3"/> Mevcut Sınav PDF'ini Görüntüle
                           </a>
                         )}
-                        <select name="existingPdfUrl" className="w-full text-sm text-slate-700 bg-slate-50 border border-slate-200 px-3 py-2.5 rounded-lg mb-3 outline-none focus:border-emerald-500" defaultValue={selectedExamForEdit?.pdfUrl || ""}>
-                           <option value="">-- Bilgisayardan Yeni Yükleyeceğim --</option>
-                           {examDocuments.map(doc => (
-                             <option key={doc.id} value={doc.url}>{doc.name} {doc.tags ? `(${doc.tags})` : ''}</option>
-                           ))}
-                        </select>
+                        <SearchableSelect
+                           name="existingPdfUrl"
+                           placeholder="-- Bilgisayardan Yeni Yükleyeceğim --"
+                           defaultValue={selectedExamForEdit?.pdfUrl || ""}
+                           options={examDocuments.map(doc => ({ value: doc.url, label: `${doc.name} ${doc.tags ? `(${doc.tags})` : ''}` }))}
+                        />
                         <div className="flex items-center gap-3">
                           <span className="text-[10px] font-bold text-slate-400">YENİ YÜKLE:</span>
                           <input name="pdfFile" type="file" accept=".pdf" className="w-full text-sm text-slate-600 file:bg-emerald-50 file:text-emerald-700 file:font-bold file:border-0 file:px-3 file:py-1.5 file:rounded-lg hover:file:bg-emerald-100 transition-colors cursor-pointer" />
@@ -1034,12 +1035,12 @@ export default function SinavlarPage() {
                             <BookOpen className="w-3 h-3"/> Mevcut Çözüm PDF'ini Görüntüle
                           </a>
                         )}
-                        <select name="existingSolutionPdfUrl" className="w-full text-sm text-slate-700 bg-slate-50 border border-slate-200 px-3 py-2.5 rounded-lg mb-3 outline-none focus:border-emerald-500" defaultValue={selectedExamForEdit?.solutionPdfUrl || ""}>
-                           <option value="">-- Bilgisayardan Yeni Yükleyeceğim --</option>
-                           {solutionDocuments.map(doc => (
-                             <option key={doc.id} value={doc.url}>{doc.name} {doc.tags ? `(${doc.tags})` : ''}</option>
-                           ))}
-                        </select>
+                        <SearchableSelect
+                           name="existingSolutionPdfUrl"
+                           placeholder="-- Bilgisayardan Yeni Yükleyeceğim --"
+                           defaultValue={selectedExamForEdit?.solutionPdfUrl || ""}
+                           options={solutionDocuments.map(doc => ({ value: doc.url, label: `${doc.name} ${doc.tags ? `(${doc.tags})` : ''}` }))}
+                        />
                         <div className="flex items-center gap-3">
                           <span className="text-[10px] font-bold text-slate-400">YENİ YÜKLE:</span>
                           <input name="solutionPdfFile" type="file" accept=".pdf" className="w-full text-sm text-slate-600 file:bg-slate-100 file:text-slate-700 file:font-bold file:border-0 file:px-3 file:py-1.5 file:rounded-lg hover:file:bg-slate-200 transition-colors cursor-pointer" />
