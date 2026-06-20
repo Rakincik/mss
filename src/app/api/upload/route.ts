@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { saveUploadedFile } from "@/lib/fileUpload";
 import path from "path";
 import { prisma } from "@/lib/prisma";
+import { logAction } from "@/lib/auditLogger";
+import { getCurrentUser } from "@/app/actions/authActions";
 
 export async function POST(req: NextRequest) {
   try {
@@ -129,6 +131,9 @@ export async function POST(req: NextRequest) {
         groups: { connect: groupsConnect }
       }
     });
+    
+    const user = await getCurrentUser();
+    await logAction("EXAM_CREATE", user, `Yeni sınav oluşturuldu: ${title}`, { examId: exam.id, questionCount });
 
     // Anahtarları Oluştur
     if (customKeys && customKeys.length > 0) {

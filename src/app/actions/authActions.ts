@@ -3,6 +3,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { logAction } from "@/lib/auditLogger";
 
 export async function loginWithCredentials(formData: FormData) {
   const email = formData.get("email") as string;
@@ -52,6 +53,8 @@ export async function loginWithCredentials(formData: FormData) {
     httpOnly: true,
     maxAge: 60 * 60 * 24 * 7 // 1 week
   });
+  
+  await logAction("USER_LOGIN", user, "Sisteme giriş yaptı.");
   
   if (user.role === "STUDENT") {
     return { success: true, redirectUrl: "/ogrenci/dashboard" };
@@ -131,6 +134,11 @@ export async function getCurrentUserWithGroups() {
 }
 
 export async function logoutUser() {
+  const user = await getCurrentUser();
+  if (user) {
+    await logAction("USER_LOGOUT", user, "Sistemden çıkış yaptı.");
+  }
+
   const cookieStore = await cookies();
   cookieStore.delete("muro_session");
   cookieStore.delete("muro_student_id");

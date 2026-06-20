@@ -2,6 +2,7 @@ import { getCurrentUserWithGroups } from "@/app/actions/authActions";
 import { prisma } from "@/lib/prisma";
 import { getCachedExam } from "@/lib/examCache";
 import { redirect } from "next/navigation";
+import { logAction } from "@/lib/auditLogger";
 import ExamInterface from "./ExamInterface";
 import { ExamErrorBoundary } from "@/components/ExamErrorBoundary";
 
@@ -72,6 +73,8 @@ export default async function SınavOdasiPage({ params }: { params: Promise<{ ex
       },
       include: { answers: true }
     });
+    
+    await logAction("EXAM_STARTED", student, `Öğrenci sınava başladı: ${exam.title}`, { examId: exam.id, resultId: result.id });
   }
 
   if (result.isFinished) {

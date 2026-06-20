@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { z } from "zod";
+import { logAction } from "@/lib/auditLogger";
 
 const finishSchema = z.object({
   resultId: z.string().min(1, "resultId boş olamaz"),
@@ -104,6 +105,13 @@ export async function POST(req: NextRequest) {
     if (updated.count === 0) {
       return NextResponse.json({ success: true, message: "Already finished (concurrent request)" });
     }
+
+    await logAction("EXAM_FINISHED", { id: userId, role: "STUDENT" }, `Öğrenci sınavı bitirdi: ${result.exam.title}`, { 
+      examId: result.exam.id, 
+      resultId, 
+      score, 
+      net: totalNet 
+    });
 
     return NextResponse.json({ success: true });
   } catch (err: any) {

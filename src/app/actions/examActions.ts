@@ -5,6 +5,7 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { saveUploadedFile } from "@/lib/fileUpload";
 import path from "path";
 import { getCurrentUser } from "./authActions";
+import { logAction } from "@/lib/auditLogger";
 
 // SINAVLARI LİSTELE (Sayfalama + Sıralama)
 export async function getExams(filters?: { search?: string, sortBy?: string, page?: number, pageSize?: number }) {
@@ -147,7 +148,12 @@ export async function createExam(formData: FormData) {
 // SINAV SİL
 export async function deleteExam(id: string) {
   // İlişkili dosyaları public/uploads'dan silme kodu da eklenebilir. Şimdilik sadece DB silme.
+  const exam = await prisma.exam.findUnique({ where: { id } });
   await prisma.exam.delete({ where: { id } });
+  
+  const user = await getCurrentUser();
+  await logAction("EXAM_DELETE", user, `Sınav silindi: ${exam?.title || id}`, { examId: id });
+  
   revalidatePath("/muro-admin/sinavlar");
   revalidateTag("exam-data", "default");
 }
@@ -341,6 +347,8 @@ export async function updateExamFull(id: string, formData: FormData) {
     where: { id },
     data: dataToUpdate
   });
+
+  await logAction("EXAM_UPDATE", currentUser, `Sınav güncellendi: ${title}`, { examId: id });
 
   revalidatePath("/muro-admin/sinavlar");
   revalidateTag("exam-data", "default");
