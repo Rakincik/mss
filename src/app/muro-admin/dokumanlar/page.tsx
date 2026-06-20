@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { getDocuments, deleteDocument } from "@/app/actions/documentActions";
-import { FileText, Search, Plus, Trash2, Folder, Tag, AlertCircle, CheckCircle, X } from "lucide-react";
+import { FileText, Search, Plus, Trash2, Folder, Tag, AlertCircle, CheckCircle, X, ArrowUpDown } from "lucide-react";
 import { DocumentType } from "@prisma/client";
 import dayjs from "dayjs";
 import 'dayjs/locale/tr';
@@ -13,7 +13,24 @@ export default function DocumentArchivePage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<DocumentType>("EXAM_PDF");
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState("newest");
   const [isUploading, setIsUploading] = useState(false);
+
+  const sortedDocuments = [...documents].sort((a, b) => {
+    switch (sortBy) {
+      case "oldest":
+        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      case "nameAsc":
+        return (a.title || a.name).localeCompare(b.title || b.name);
+      case "nameDesc":
+        return (b.title || b.name).localeCompare(a.title || a.name);
+      case "sizeDesc":
+        return (b.sizeBytes || 0) - (a.sizeBytes || 0);
+      case "newest":
+      default:
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    }
+  });
   const [showTagModal, setShowTagModal] = useState(false);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   
@@ -176,20 +193,37 @@ export default function DocumentArchivePage() {
         </button>
       </div>
 
-      <div className="flex justify-between items-center mb-6">
-        <div className="relative w-full max-w-md">
-          <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-          <input 
-            type="text" 
-            placeholder="Doküman adı veya etiket ara..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-sm"
-          />
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+        <div className="flex flex-col sm:flex-row gap-3 w-full max-w-2xl">
+          <div className="relative w-full sm:max-w-md">
+            <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input 
+              type="text" 
+              placeholder="Doküman adı veya etiket ara..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-sm"
+            />
+          </div>
+          
+          <div className="relative w-full sm:w-auto shrink-0">
+            <select 
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="w-full h-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer shadow-sm appearance-none pr-10"
+            >
+              <option value="newest">En Son Eklenenler</option>
+              <option value="oldest">İlk Eklenenler</option>
+              <option value="nameAsc">İsme Göre (A-Z)</option>
+              <option value="nameDesc">İsme Göre (Z-A)</option>
+              <option value="sizeDesc">Boyuta Göre (Büyükten Küçüğe)</option>
+            </select>
+            <ArrowUpDown className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+          </div>
         </div>
         
-        <div className="text-sm text-slate-500 font-medium">
-          Toplam <span className="text-slate-800 font-bold">{documents.length}</span> kayıt bulundu
+        <div className="text-sm text-slate-500 font-medium whitespace-nowrap">
+          Toplam <span className="text-slate-800 font-bold">{documents.length}</span> kayıt
         </div>
       </div>
 
@@ -203,7 +237,7 @@ export default function DocumentArchivePage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {documents.map(doc => (
+          {sortedDocuments.map(doc => (
             <div key={doc.id} className="relative bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all group flex flex-col">
               
               {/* Silme Butonu (Linkin Dışında) */}
