@@ -68,19 +68,6 @@ export default async function AdminDashboard() {
   return (
     <div className="max-w-6xl mx-auto space-y-8 text-slate-800">
       
-      {/* Welcome Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white p-6 shadow-md">
-         <div className="absolute top-0 right-0 w-80 h-80 bg-blue-500/10 rounded-full -mr-40 -mt-40" />
-         <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-500/10 rounded-full -ml-32 -mb-32" />
-
-         <div className="relative flex items-center justify-between flex-wrap gap-4">
-             <div className="space-y-1">
-                 <h1 className="text-2xl font-bold">{currentUser?.name || "Sistem"} Dashboard</h1>
-                 <p className="text-white/50 text-sm">{currentUser?.name || "Sistem"} genel durum özeti.</p>
-             </div>
-         </div>
-      </div>
-
       {/* Stats Grid — GERÇEK VERİLER */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {[

@@ -73,7 +73,7 @@ export default function AdminShell({ children, user }: AdminShellProps) {
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto custom-scrollbar">
           
           <div className="px-3 pb-2 pt-2 text-[10px] uppercase tracking-widest font-bold text-slate-400">Yönetim</div>
-          <NavItem href="/muro-admin" icon={LayoutDashboard} label="Dashboard" color="text-blue-600" />
+          <NavItem href="/muro-admin" icon={LayoutDashboard} label="Ana Sayfa" color="text-blue-600" />
 
           {user.role !== "MUHASEBE" && (
             <>
