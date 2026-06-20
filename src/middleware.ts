@@ -25,9 +25,8 @@ export function middleware(request: NextRequest) {
       });
     }
 
-    // Giriş yapmış kullanıcı — isteği devam ettir + cache header ekle
+    // Giriş yapmış kullanıcı — isteği devam ettir
     const response = NextResponse.next();
-    response.headers.set("Cache-Control", "private, max-age=86400"); // 24 saat, sadece bu tarayıcı
     response.headers.set("X-Content-Type-Options", "nosniff");
     return response;
   }
