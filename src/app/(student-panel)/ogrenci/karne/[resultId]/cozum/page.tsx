@@ -1,7 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/app/actions/authActions";
 import { redirect } from "next/navigation";
-import SolutionInterface from "./SolutionInterface";
+import dynamic from "next/dynamic";
+
+const SolutionInterface = dynamic(() => import("./SolutionInterface"), { ssr: false });
 
 export default async function SınavCozumEkraniPage({ params }: { params: Promise<{ resultId: string }> }) {
   const resolvedParams = await params;
