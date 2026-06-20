@@ -5,6 +5,7 @@ import { getDocuments, deleteDocument } from "@/app/actions/documentActions";
 import { FileText, Search, Plus, Trash2, Folder, Tag, AlertCircle, CheckCircle, X, ArrowUpDown } from "lucide-react";
 import { DocumentType } from "@prisma/client";
 import dayjs from "dayjs";
+import SearchableSelect from "@/components/ui/SearchableSelect";
 import 'dayjs/locale/tr';
 dayjs.locale('tr');
 
@@ -338,36 +339,37 @@ export default function DocumentArchivePage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-semibold text-slate-700 mb-1">Kategori / Tür</label>
-                    <select 
+                    <SearchableSelect 
                       value={modalCategory}
-                      onChange={(e) => setModalCategory(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm"
-                    >
-                      <option value="">Seçiniz...</option>
-                      <option value="TYT">TYT</option>
-                      <option value="AYT">AYT</option>
-                      <option value="YKS">YKS (Genel)</option>
-                      <option value="LGS">LGS</option>
-                      <option value="KPSS">KPSS</option>
-                      <option value="DGS">DGS</option>
-                      <option value="ALES">ALES</option>
-                      <option value="YDS">YDS</option>
-                      <option value="Kurum İçi">Kurum İçi Sınav</option>
-                    </select>
+                      onChange={(val) => setModalCategory(val)}
+                      hideSearch={true}
+                      options={[
+                        { value: 'TYT', label: 'TYT' },
+                        { value: 'AYT', label: 'AYT' },
+                        { value: 'YKS', label: 'YKS (Genel)' },
+                        { value: 'LGS', label: 'LGS' },
+                        { value: 'KPSS', label: 'KPSS' },
+                        { value: 'DGS', label: 'DGS' },
+                        { value: 'ALES', label: 'ALES' },
+                        { value: 'YDS', label: 'YDS' },
+                        { value: 'Kurum İçi', label: 'Kurum İçi Sınav' }
+                      ]}
+                    />
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-slate-700 mb-1">Eğitim Yılı</label>
-                    <select 
+                    <SearchableSelect 
                       value={modalAcademicYear}
-                      onChange={(e) => setModalAcademicYear(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm"
-                    >
-                      <option value="">Seçiniz...</option>
-                      <option value="2024-2025">2024-2025</option>
-                      <option value="2023-2024">2023-2024</option>
-                      <option value="2022-2023">2022-2023</option>
-                      <option value="Çıkmış Soru">Çıkmış Soru</option>
-                    </select>
+                      onChange={(val) => setModalAcademicYear(val)}
+                      hideSearch={true}
+                      options={[
+                        { value: '2025-2026', label: '2025-2026' },
+                        { value: '2024-2025', label: '2024-2025' },
+                        { value: '2023-2024', label: '2023-2024' },
+                        { value: '2022-2023', label: '2022-2023' },
+                        { value: 'Çıkmış Soru', label: 'Çıkmış Soru' }
+                      ]}
+                    />
                   </div>
                 </div>
 
