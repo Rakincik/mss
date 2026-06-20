@@ -1072,6 +1072,7 @@ export default function SinavlarPage() {
                       <option value="KPSS_P121">📜 KPSS P121 (Öğretmenlik - Alan Sınavı Olan)</option>
                       <option value="KPSS_P93">📜 KPSS P93 (Ön Lisans Memurluk)</option>
                       <option value="KPSS_P94">📜 KPSS P94 (Ortaöğretim Memurluk)</option>
+                      <option value="KPSS_P48">📜 KPSS P48 (A Grubu Alan)</option>
                       <option value="KAYMAKAMLIK">📜 Kaymakamlık Formatı</option>
                       <option value="HMGS">📜 HMGS Hukuk Sınavı</option>
                       <option value="ICRA">📜 İcra Müdür Yrd.</option>
