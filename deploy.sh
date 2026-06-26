@@ -15,6 +15,14 @@ npm run build
 
 echo "🔧 Server wrapper oluşturuluyor..."
 cat > .next/standalone/server-wrapper.js << 'WRAPPER'
+// Load environment variables from the root .env file
+const path = require('path');
+try {
+  require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
+} catch (e) {
+  console.log('dotenv loading failed:', e.message);
+}
+
 // LiteSpeed duplicate Origin header fix
 const http = require('http');
 const originalCreateServer = http.createServer.bind(http);
