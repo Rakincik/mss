@@ -50,14 +50,13 @@ export default function StudentShell({ children, student }: StudentShellProps) {
       {/* Sidebar */}
       <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-72 bg-white flex flex-col border-r border-slate-200 shrink-0 shadow-sm transform transition-transform duration-300 ease-in-out print:hidden ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
         
-        {/* Logo & Brand */}
-        <div className="py-5 flex items-center justify-between px-6 shrink-0 border-b border-slate-100 min-h-[80px]">
+        <div className="py-2 flex items-center justify-between px-6 shrink-0 border-b border-slate-100 min-h-[130px]">
           <Link href="/ogrenci/dashboard" className="flex items-center justify-center group w-full">
             {process.env.NEXT_PUBLIC_LOGO_PATH && process.env.NEXT_PUBLIC_LOGO_PATH !== "/muro-logo.png" ? (
               <img 
                 src={process.env.NEXT_PUBLIC_LOGO_PATH} 
                 alt="Kurum Logosu" 
-                className="w-full h-auto max-h-[80px] object-contain"
+                className="w-full h-auto max-h-[120px] object-contain"
               />
             ) : (
               <>

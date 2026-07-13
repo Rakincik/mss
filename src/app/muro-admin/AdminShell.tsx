@@ -51,10 +51,10 @@ export default function AdminShell({ children, user }: AdminShellProps) {
 
       {/* Sidebar */}
       <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white border-r border-slate-200 flex flex-col shadow-sm transform transition-transform duration-300 ease-in-out print:hidden ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
-        <div className="py-3 flex items-center justify-between px-6 border-b border-slate-100 shrink-0 min-h-[90px]">
+        <div className="py-1 flex items-center justify-between px-6 border-b border-slate-100 shrink-0 min-h-[130px]">
           <div className="flex items-center gap-2 w-full justify-center">
             {process.env.NEXT_PUBLIC_LOGO_PATH && process.env.NEXT_PUBLIC_LOGO_PATH !== "/muro-logo.png" ? (
-              <img src={process.env.NEXT_PUBLIC_LOGO_PATH} alt="Logo" className="w-full h-auto max-h-[80px] object-contain" />
+              <img src={process.env.NEXT_PUBLIC_LOGO_PATH} alt="Logo" className="w-full h-auto max-h-[120px] object-contain" />
             ) : (
               <div className="flex items-center gap-2">
                 <LayoutDashboard className="w-6 h-6 text-blue-600" />
