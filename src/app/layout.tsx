@@ -12,7 +12,7 @@ const inter = Inter({
 import type { Viewport } from "next";
 
 export const metadata: Metadata = {
-  title: "4T Akademi Online Sınav",
+  title: process.env.NEXT_PUBLIC_SITE_NAME || "MSS Sınav Sistemi",
   description: "Kesintisiz yeni nesil sınav platformu.",
   icons: {
     icon: "/favicon.png",
