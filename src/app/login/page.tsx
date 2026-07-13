@@ -34,7 +34,7 @@ export default function LoginPage() {
         
         {/* İkon / Logo */}
         {process.env.NEXT_PUBLIC_LOGO_PATH && process.env.NEXT_PUBLIC_LOGO_PATH !== "/muro-logo.png" ? (
-          <div className="mx-auto w-full max-w-[280px] h-28 mb-8 flex items-center justify-center">
+          <div className="mx-auto w-full max-w-[320px] h-36 mb-6 flex items-center justify-center">
             <img 
               src={process.env.NEXT_PUBLIC_LOGO_PATH} 
               alt="Kurum Logosu" 
